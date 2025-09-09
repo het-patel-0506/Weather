@@ -3,7 +3,7 @@ module.exports = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
   transform: {
     "^.+\\.[tj]sx?$": [
-      "babel-jest",
+        "babel-jest",
       {
         presets: [
           ["@babel/preset-env", { targets: { node: "current" } }],

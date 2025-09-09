@@ -12,22 +12,33 @@ function WeatherIcon({ id, description }) {
 }
 
 export default function WeatherCard({ data, isFavorite, onToggleFavorite, unit = "C", onToggleUnit, onShare }) {
-  const city = `${data.name}${data.sys?.country ? ", " + data.sys.country : ""}`;
-  const weather = data.weather?.[0];
-  const cTemp = Math.round(data.main?.temp ?? 0);
-  const temp = unit === "F" ? Math.round((cTemp * 9) / 5 + 32) : cTemp;
-  const humidity = data.main?.humidity;
-  const wind = Math.round((data.wind?.speed ?? 0) * 10) / 10;
-  const updated = new Date((data.dt ?? Date.now()) * 1000);
-  const feelsC = Math.round(data.main?.feels_like ?? cTemp);
-  const feels = unit === "F" ? Math.round((feelsC * 9) / 5 + 32) : feelsC;
-  const pressure = data.main?.pressure;
+  // Support both mapped internal shape and raw OpenWeather shape
+  const cityName = data.city || data.name || "";
+  const country = data.country || data.sys?.country || "";
+  const weather = data.weather?.[0] || (data.condition ? { id: data.iconId, description: data.condition } : undefined);
+  const baseTempC =
+    typeof data.temperature === "number"
+      ? Math.round(data.temperature)
+      : Math.round(data.main?.temp ?? 0);
+  const temp = unit === "F" ? Math.round((baseTempC * 9) / 5 + 32) : baseTempC;
+  const humidity =
+    typeof data.humidity === "number" ? data.humidity : data.main?.humidity;
+  const windMs = typeof data.wind === "number" ? data.wind : data.wind?.speed;
+  const wind = Math.round((windMs ?? 0) * 10) / 10;
+  const tsMs = data.timestamp || ((data.dt ?? Date.now()) * 1000);
+  const updated = new Date(tsMs);
+  const baseFeelsC =
+    typeof data.feels_like === "number"
+      ? Math.round(data.feels_like)
+      : Math.round(data.main?.feels_like ?? baseTempC);
+  const feels = unit === "F" ? Math.round((baseFeelsC * 9) / 5 + 32) : baseFeelsC;
+  const pressure = typeof data.pressure === "number" ? data.pressure : data.main?.pressure;
 
   return (
     <article className="relative rounded-2xl shadow-md bg-white dark:bg-slate-800 p-6 lg:p-8 transition-all duration-300">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-xl md:text-2xl font-semibold">{city}</h2>
+          <h2 className="text-xl md:text-2xl font-semibold">{cityName}{country ? `, ${country}` : ""}</h2>
           <div className="text-xs text-slate-500 dark:text-slate-400">{updated.toLocaleString()}</div>
         </div>
         <div className="flex items-center gap-2">

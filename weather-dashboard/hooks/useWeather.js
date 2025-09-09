@@ -94,9 +94,13 @@ export function useWeather() {
 
   const toggleUnit = useCallback(() => {
     setUnit((u) => (u === "C" ? "F" : "C"));
-    // unit change invalidates cache usage for currently displayed city; refetch if we have lastQuery
-    if (lastQuery) search(lastQuery);
-  }, [setUnit]);
+    const currentCity = (data && (data.city || data.name)) || lastQuery;
+    if (currentCity) {
+      // Refetch immediately for the displayed city using the new unit
+      const nextUnit = unit === "C" ? "F" : "C";
+      void doFetch(currentCity, nextUnit);
+    }
+  }, [data, lastQuery, unit, doFetch, setUnit]);
 
   const toggleTheme = useCallback(() => {
     setTheme((t) => (t === "dark" ? "light" : "dark"));

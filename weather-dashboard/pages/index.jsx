@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
 import StatusRow from "../components/StatusRow";
@@ -24,6 +24,8 @@ export default function HomePage() {
   } = useWeather();
 
   const resultRef = useRef(null);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   useEffect(() => {
     if (data && !loading && !error) {
       resultRef.current?.focus?.();
@@ -38,31 +40,35 @@ export default function HomePage() {
           onSearch={(city) => search(city)}
           loading={loading}
         />
-        <StatusRow
-          lastSearched={lastQuery}
-          favorites={favorites}
-          onChipClick={(city) => {
-            search(city);
-          }}
-        />
-        <main>
-          <WeatherArea
-            loading={loading}
-            error={error}
-            data={data}
-            isFavorite={isFavorite}
-            onToggleFavorite={toggleFavorite}
-            unit={unit}
-            onToggleUnit={toggleUnit}
-            onShare={share}
-            forecastDays={data ? [
-              { label: "Today", min: "-", max: "-", icon: "⛅" },
-              { label: "Tomorrow", min: "-", max: "-", icon: "⛅" },
-              { label: "+2d", min: "-", max: "-", icon: "⛅" },
-            ] : []}
-          />
-          <div ref={resultRef} tabIndex={-1} aria-hidden className="sr-only">results-focus-sentinel</div>
-        </main>
+        {mounted ? (
+          <>
+            <StatusRow
+              lastSearched={lastQuery}
+              favorites={favorites}
+              onChipClick={(city) => {
+                search(city);
+              }}
+            />
+            <main suppressHydrationWarning>
+              <WeatherArea
+                loading={loading}
+                error={error}
+                data={data}
+                isFavorite={isFavorite}
+                onToggleFavorite={toggleFavorite}
+                unit={unit}
+                onToggleUnit={toggleUnit}
+                onShare={share}
+                forecastDays={data ? [
+                  { label: "Today", min: unit === "F" ? "70°F" : "21°C", max: unit === "F" ? "76°F" : "24°C", icon: "☀️" },
+                  { label: "Tomorrow", min: unit === "F" ? "68°F" : "20°C", max: unit === "F" ? "74°F" : "23°C", icon: "⛅" },
+                  { label: "+2d", min: unit === "F" ? "66°F" : "19°C", max: unit === "F" ? "72°F" : "22°C", icon: "🌤️" },
+                ] : []}
+              />
+              <div ref={resultRef} tabIndex={-1} aria-hidden className="sr-only">results-focus-sentinel</div>
+            </main>
+          </>
+        ) : null}
         <Footer />
       </div>
     </div>
