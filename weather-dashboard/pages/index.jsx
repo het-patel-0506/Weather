@@ -1,15 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import Header from "../components/Header";
-import DarkHeader from "../components/DarkHeader";
-import LeftNav from "../components/LeftNav";
-import MainWeatherPro from "../components/MainWeatherPro";
-import HourlyStrip from "../components/HourlyStrip";
-import ForecastPanel from "../components/ForecastPanel";
-import MapPreview from "../components/MapPreview";
 import SearchBar from "../components/SearchBar";
 import StatusRow from "../components/StatusRow";
 import WeatherArea from "../components/WeatherArea";
 import Footer from "../components/Footer";
+import LeftNav from "../components/LeftNav";
 import { useWeather } from "../hooks/useWeather";
 
 export default function HomePage() {
@@ -41,42 +36,61 @@ export default function HomePage() {
     }
   }, [data, loading, error]);
 
+  const activeCity = (data && (data.city || data.name)) || lastQuery || "";
+  const defaultCities = ["New York City", "London", "Tokyo", "San Francisco, CA"];
+  const cities = Array.from(
+    new Set([...(favorites || []), ...(activeCity ? [activeCity] : []), ...defaultCities])
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
-        <div className="min-h-[80vh] rounded-[24px] bg-[#0b1220] text-slate-200 shadow-xl border border-white/10 p-4 md:p-6 backdrop-blur relative">
-          <DarkHeader />
-          <div className="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <aside className="lg:col-span-3 rounded-2xl bg-white/5 border border-white/10 p-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+        <Header theme={theme} onToggleTheme={toggleTheme} onHelp={() => alert("Enter a city name and press Search. Toggle theme with the moon/sun.")} />
+        <SearchBar onSearch={(city) => search(city)} loading={loading} />
+        {mounted ? (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <aside className="lg:col-span-3">
               <LeftNav
-                cities={["New York City", "London", "Tokyo", "Toxyor", "San Francisco, CA"]}
-                activeCity={lastQuery || (data?.city || data?.name) || ""}
+                cities={cities}
+                activeCity={activeCity}
                 onSelect={(city) => search(city)}
-                onAdd={() => alert("Add city")}
+                onAdd={() => {
+                  const city = window.prompt("Add a city to view:");
+                  if (city && city.trim()) search(city.trim());
+                }}
               />
             </aside>
-            <main className="lg:col-span-6">
-              <MainWeatherPro
-                temp={data ? Math.round((data.main?.temp ?? data.temperature ?? 0)) : (unit === "F" ? 72 : 22)}
-                unit={unit}
-                condition={data?.weather?.[0]?.description || "Partly Cloudy"}
-                high={unit === "F" ? 78 : 26}
-                low={unit === "F" ? 65 : 18}
+            <div className="lg:col-span-9">
+              <StatusRow
+                lastSearched={lastQuery}
+                favorites={favorites}
+                onChipClick={(city) => {
+                  search(city);
+                }}
               />
-              <HourlyStrip hours={[{ time: "5 PM", temp: unit === "F" ? "50°F" : "10°C" }, { time: "8 PM", temp: unit === "F" ? "45°F" : "7°C" }, { time: "11 PM", temp: unit === "F" ? "40°F" : "4°C" }, { time: "2 AM", temp: unit === "F" ? "38°F" : "3°C" }]} />
-            </main>
-            <aside className="lg:col-span-3 flex flex-col gap-4">
-              <ForecastPanel days={[
-                { label: "Mon", min: unit === "F" ? "50°F" : "10°C", max: unit === "F" ? "76°F" : "24°C", icon: "🌤️" },
-                { label: "Tue", min: unit === "F" ? "48°F" : "9°C", max: unit === "F" ? "72°F" : "22°C", icon: "🌦️" },
-                { label: "Wed", min: unit === "F" ? "52°F" : "11°C", max: unit === "F" ? "74°F" : "23°C", icon: "⛅" },
-                { label: "Thu", min: unit === "F" ? "55°F" : "13°C", max: unit === "F" ? "75°F" : "24°C", icon: "🌧️" },
-                { label: "Fri", min: unit === "F" ? "54°F" : "12°C", max: unit === "F" ? "73°F" : "23°C", icon: "⛅" },
-              ]} />
-              <MapPreview />
-            </aside>
+              <main suppressHydrationWarning>
+                <WeatherArea
+                  loading={loading}
+                  error={error}
+                  data={data}
+                  isFavorite={isFavorite}
+                  onToggleFavorite={toggleFavorite}
+                  unit={unit}
+                  onToggleUnit={toggleUnit}
+                  onShare={share}
+                  statusMessage={statusMessage}
+                  servedFromCache={servedFromCache}
+                  forecastDays={data ? [
+                    { label: "Today", min: unit === "F" ? "70°F" : "21°C", max: unit === "F" ? "76°F" : "24°C", icon: "☀️" },
+                    { label: "Tomorrow", min: unit === "F" ? "68°F" : "20°C", max: unit === "F" ? "74°F" : "23°C", icon: "⛅" },
+                    { label: "+2d", min: unit === "F" ? "66°F" : "19°C", max: unit === "F" ? "72°F" : "22°C", icon: "🌤️" },
+                  ] : []}
+                />
+                <div ref={resultRef} tabIndex={-1} aria-hidden className="sr-only">results-focus-sentinel</div>
+              </main>
+            </div>
           </div>
-        </div>
+        ) : null}
         <Footer />
       </div>
     </div>
