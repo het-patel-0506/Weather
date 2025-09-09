@@ -62,7 +62,6 @@ export default function HomePage() {
             ] : []}
           />
           <div ref={resultRef} tabIndex={-1} aria-hidden className="sr-only">results-focus-sentinel</div>
-          />
         </main>
         <Footer />
       </div>
