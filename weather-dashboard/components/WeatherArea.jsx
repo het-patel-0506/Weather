@@ -3,6 +3,7 @@ import Spinner from "./Spinner";
 import ErrorBanner from "./ErrorBanner";
 import WeatherCard from "./WeatherCard";
 import ForecastStrip from "./ForecastStrip";
+import { CardSkeleton, ForecastSkeleton } from "./Skeletons";
 
 export default function WeatherArea({
   loading,
@@ -14,11 +15,14 @@ export default function WeatherArea({
   onToggleUnit,
   onShare,
   forecastDays = [],
+  statusMessage,
 }) {
+  const isBusy = !!loading;
   return (
-    <section role="region" aria-live="polite" className="grid grid-cols-1 lg:grid-cols-12 gap-6" aria-label="Weather results">
+    <section role="region" aria-live="polite" aria-busy={isBusy ? "true" : "false"} className="grid grid-cols-1 lg:grid-cols-12 gap-6" aria-label="Weather results">
       <div className="lg:col-span-8 relative">
         {!data && !loading && !error ? <EmptyState /> : null}
+        {!data && loading ? <CardSkeleton /> : null}
         {data ? (
           <WeatherCard
             data={data}
@@ -30,8 +34,8 @@ export default function WeatherArea({
           />
         ) : null}
         {loading ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/70 dark:bg-slate-900/70">
-            <Spinner />
+          <div className="absolute inset-0 flex items-center justify-center bg-white/70 dark:bg-slate-900/70" aria-hidden={false}>
+            <Spinner label={statusMessage || "Fetching latest weather…"} />
           </div>
         ) : null}
         {error ? (
@@ -45,7 +49,12 @@ export default function WeatherArea({
         ) : null}
       </div>
       <aside className="lg:col-span-4">
-        <ForecastStrip days={forecastDays} />
+        {loading && !forecastDays?.length ? <ForecastSkeleton /> : <ForecastStrip days={forecastDays} />}
+        {data && !forecastDays?.length && !loading ? (
+          <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 text-amber-800 p-3 text-sm">
+            Forecast data is unavailable. Showing current conditions only.
+          </div>
+        ) : null}
       </aside>
     </section>
   );

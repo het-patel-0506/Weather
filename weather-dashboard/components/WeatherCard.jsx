@@ -16,22 +16,24 @@ export default function WeatherCard({ data, isFavorite, onToggleFavorite, unit =
   const cityName = data.city || data.name || "";
   const country = data.country || data.sys?.country || "";
   const weather = data.weather?.[0] || (data.condition ? { id: data.iconId, description: data.condition } : undefined);
-  const baseTempC =
+  // Values coming from API are already in the requested units (metric/imperial),
+  // so don't reconvert here; just round for display.
+  const rawTemp =
     typeof data.temperature === "number"
-      ? Math.round(data.temperature)
-      : Math.round(data.main?.temp ?? 0);
-  const temp = unit === "F" ? Math.round((baseTempC * 9) / 5 + 32) : baseTempC;
+      ? data.temperature
+      : data.main?.temp ?? 0;
+  const temp = Math.round(rawTemp);
   const humidity =
     typeof data.humidity === "number" ? data.humidity : data.main?.humidity;
   const windMs = typeof data.wind === "number" ? data.wind : data.wind?.speed;
   const wind = Math.round((windMs ?? 0) * 10) / 10;
   const tsMs = data.timestamp || ((data.dt ?? Date.now()) * 1000);
   const updated = new Date(tsMs);
-  const baseFeelsC =
+  const rawFeels =
     typeof data.feels_like === "number"
-      ? Math.round(data.feels_like)
-      : Math.round(data.main?.feels_like ?? baseTempC);
-  const feels = unit === "F" ? Math.round((baseFeelsC * 9) / 5 + 32) : baseFeelsC;
+      ? data.feels_like
+      : data.main?.feels_like ?? rawTemp;
+  const feels = Math.round(rawFeels);
   const pressure = typeof data.pressure === "number" ? data.pressure : data.main?.pressure;
 
   return (
@@ -39,7 +41,7 @@ export default function WeatherCard({ data, isFavorite, onToggleFavorite, unit =
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-xl md:text-2xl font-semibold">{cityName}{country ? `, ${country}` : ""}</h2>
-          <div className="text-xs text-slate-500 dark:text-slate-400">{updated.toLocaleString()}</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400">Last updated {updated.toLocaleString()}</div>
         </div>
         <div className="flex items-center gap-2">
           <FavoriteButton isFavorite={isFavorite} onToggle={onToggleFavorite} />
@@ -78,7 +80,7 @@ export default function WeatherCard({ data, isFavorite, onToggleFavorite, unit =
 
       <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
         <MetricTile label="Humidity" value={humidity} unit="%" icon="💧" />
-        <MetricTile label="Wind" value={wind} unit="m/s" icon="🌬️" />
+        <MetricTile label="Wind" value={wind} unit={unit === "F" ? "mph" : "m/s"} icon="🌬️" />
         <MetricTile label="Feels like" value={feels} unit={`°${unit}`} icon="🌡️" />
         <MetricTile label="Pressure" value={pressure} unit="hPa" icon="📈" />
       </div>

@@ -12,6 +12,8 @@ export function useWeather() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [servedFromCache, setServedFromCache] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
   const debounceRef = useRef(null);
   const abortRef = useRef(null);
 
@@ -27,6 +29,8 @@ export function useWeather() {
         setError("");
         setLoading(false);
         setLastQuery(city);
+        setServedFromCache(true);
+        setStatusMessage("Served from cache");
         return;
       }
 
@@ -45,6 +49,8 @@ export function useWeather() {
           setData(result);
           setError("");
           setLastQuery(city);
+          setServedFromCache(false);
+          setStatusMessage("Loaded");
         } catch (err) {
           if (controller.signal.aborted) return; // cancelled
           const msg = err?.message || "Network error — check connection";
@@ -55,6 +61,7 @@ export function useWeather() {
           }
           setData(null);
           setError(msg);
+          setStatusMessage("Error");
         } finally {
           setLoading(false);
         }
@@ -126,6 +133,8 @@ export function useWeather() {
     loading,
     error,
     search,
+    statusMessage,
+    servedFromCache,
     retry,
     lastQuery,
     favorites,
