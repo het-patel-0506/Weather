@@ -35,10 +35,10 @@ export default function WeatherArea({
           </div>
         ) : null}
         {error ? (
-          <div className="mt-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg p-4 flex items-start gap-3">
+          <div className="mt-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg p-4 flex items-start gap-3" role="alert">
             <span aria-hidden>⚠️</span>
             <div className="flex-1">{error}</div>
-            <button type="button" className="rounded-md bg-rose-600 text-white px-3 py-1 text-sm" onClick={() => window.location.reload()}>
+            <button type="button" className="rounded-md bg-rose-600 text-white px-3 py-1 text-sm" onClick={() => location.reload()}>
               Retry
             </button>
           </div>
