@@ -61,23 +61,24 @@ export default function HomePage() {
       }}></div>
       
       <div className="relative w-full px-4 sm:px-6 lg:px-8 py-6 md:py-10">
-        <DarkHeader 
-          theme={theme} 
-          onToggleTheme={toggleTheme} 
-          onHelp={() => alert("Enter a city name and press Search. Toggle theme with the moon/sun.")}
-          onSettings={() => alert("Settings panel coming soon")}
-          onLocation={() => alert("Location services coming soon")}
-          onMenu={() => alert("Menu panel coming soon")}
-        />
+                <DarkHeader
+                  theme={theme}
+                  onToggleTheme={toggleTheme}
+                  onSearch={search}
+                  onHelp={() => alert("Enter a city name and press Search. Toggle theme with the moon/sun.")}
+                  onSettings={() => alert("Settings panel coming soon")}
+                  onLocation={() => alert("Location services coming soon")}
+                  onMenu={() => alert("Menu panel coming soon")}
+                />
         {mounted ? (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             {/* Left Column - Cities Sidebar */}
             <aside className="lg:col-span-2">
-              <div className={`backdrop-blur-xl rounded-2xl p-6 shadow-2xl sticky top-6 transition-all duration-300 ${
-                theme === "dark" 
-                  ? "bg-white/5 border border-white/10" 
-                  : "bg-white/80 border border-slate-200/50"
-              }`}>
+                      <div className={`backdrop-blur-xl rounded-2xl p-6 shadow-2xl sticky top-6 transition-all duration-300 ${
+                        theme === "dark"
+                          ? "bg-white/10 border border-white/20"
+                          : "bg-white/95 border border-slate-200/70"
+                      }`}>
                 <LeftNav
                   cities={cities}
                   activeCity={activeCity}
@@ -100,17 +101,18 @@ export default function HomePage() {
             
             {/* Center Column - Main Weather */}
             <div className="lg:col-span-6">
-              <div className={`backdrop-blur-xl rounded-2xl p-6 shadow-2xl transition-all duration-300 ${
-                theme === "dark" 
-                  ? "bg-white/5 border border-white/10" 
-                  : "bg-white/80 border border-slate-200/50"
-              }`}>
+                      <div className={`backdrop-blur-xl rounded-2xl p-6 shadow-2xl transition-all duration-300 ${
+                        theme === "dark"
+                          ? "bg-white/10 border border-white/20"
+                          : "bg-white/95 border border-slate-200/70"
+                      }`}>
                 <StatusRow
                   lastSearched={lastQuery}
                   favorites={favorites}
                   onChipClick={(city) => {
                     search(city);
                   }}
+                  theme={theme}
                 />
                 <main suppressHydrationWarning>
                   {loading && !data ? (

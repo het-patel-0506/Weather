@@ -84,11 +84,11 @@ export default function CitySearch({ cities = [], onSelect, onAdd, theme = "dark
           onKeyDown={handleKeyDown}
           onFocus={() => setShowSuggestions(true)}
           placeholder="Search cities..."
-          className={`w-full pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent backdrop-blur-sm transition-all duration-300 ${
-            theme === "dark"
-              ? "bg-white/10 border border-white/20 text-white placeholder-white/60 focus:ring-white/50"
-              : "bg-slate-100/80 border border-slate-300/50 text-slate-900 placeholder-slate-500 focus:ring-slate-400"
-          }`}
+                  className={`w-full pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent backdrop-blur-sm transition-all duration-300 ${
+                    theme === "dark"
+                      ? "bg-white/20 border border-white/30 text-white placeholder-white/70 focus:ring-white/50"
+                      : "bg-white/90 border border-slate-300/70 text-slate-900 placeholder-slate-600 focus:ring-slate-400"
+                  }`}
         />
         {searchTerm && (
           <button
@@ -105,22 +105,22 @@ export default function CitySearch({ cities = [], onSelect, onAdd, theme = "dark
 
       {/* Search suggestions dropdown */}
       {showSuggestions && (searchTerm || filteredCities.length > 0) && (
-        <div className={`absolute z-50 w-full mt-1 backdrop-blur-xl rounded-lg shadow-2xl max-h-60 overflow-y-auto transition-all duration-300 ${
-          theme === "dark"
-            ? "bg-white/10 border border-white/20"
-            : "bg-white/90 border border-slate-200/50"
-        }`}>
+                <div className={`absolute z-50 w-full mt-1 backdrop-blur-xl rounded-lg shadow-2xl max-h-60 overflow-y-auto transition-all duration-300 ${
+                  theme === "dark"
+                    ? "bg-white/20 border border-white/30"
+                    : "bg-white/95 border border-slate-200/70"
+                }`}>
           {filteredCities.length > 0 ? (
             filteredCities.slice(0, 8).map((city, index) => (
               <button
                 key={index}
                 type="button"
                 onClick={() => handleCitySelect(city)}
-                className={`w-full px-4 py-2 text-left transition-colors first:rounded-t-lg last:rounded-b-lg ${
-                  theme === "dark"
-                    ? "text-white hover:bg-white/10"
-                    : "text-slate-900 hover:bg-slate-100/80"
-                }`}
+                        className={`w-full px-4 py-2 text-left transition-colors first:rounded-t-lg last:rounded-b-lg ${
+                          theme === "dark"
+                            ? "text-white hover:bg-white/20"
+                            : "text-slate-900 hover:bg-slate-100/90"
+                        }`}
               >
                 <div className="flex items-center gap-2">
                   <span aria-hidden>📍</span>
@@ -132,11 +132,11 @@ export default function CitySearch({ cities = [], onSelect, onAdd, theme = "dark
             <button
               type="button"
               onClick={handleAddCity}
-              className={`w-full px-4 py-2 text-left transition-colors rounded-lg ${
-                theme === "dark"
-                  ? "text-white hover:bg-white/10"
-                  : "text-slate-900 hover:bg-slate-100/80"
-              }`}
+                      className={`w-full px-4 py-2 text-left transition-colors rounded-lg ${
+                        theme === "dark"
+                          ? "text-white hover:bg-white/20"
+                          : "text-slate-900 hover:bg-slate-100/90"
+                      }`}
             >
               <div className="flex items-center gap-2">
                 <span aria-hidden>➕</span>
