@@ -3,8 +3,18 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  const { city, units = "metric" } = req.query;
-  const apiKey = process.env.OPENWEATHER_API_KEY || process.env.WEATHER_API_KEY || process.env.NEXT_PUBLIC_WEATHER_API_KEY;
+  const { city, units = "metric", mock } = req.query;
+  // Resolve API key from env. In development, allow ?key= for quick local testing (never use in production).
+  let apiKey =
+    process.env.OPENWEATHER_API_KEY ||
+    process.env.WEATHER_API_KEY ||
+    process.env.NEXT_PUBLIC_WEATHER_API_KEY ||
+    process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY ||
+    "";
+
+  if (!apiKey && process.env.NODE_ENV !== "production" && typeof req.query.key === "string") {
+    apiKey = req.query.key; // Dev-only convenience
+  }
   if (!apiKey) {
     return res.status(500).json({ message: "Server API key not configured" });
   }
@@ -16,6 +26,41 @@ export default async function handler(req, res) {
   url.searchParams.set("q", city);
   url.searchParams.set("appid", apiKey);
   url.searchParams.set("units", units === "imperial" ? "imperial" : "metric");
+
+  const shouldMock =
+    process.env.NODE_ENV !== "production" && (process.env.MOCK_WEATHER === "1" || mock === "1");
+
+  const SAMPLE = {
+    london: { temp: 21, feels_like: 20, humidity: 58, pressure: 1013, wind: 3.1, desc: "clear sky", id: 800, country: "GB", coord: { lon: -0.1276, lat: 51.5072 } },
+    paris: { temp: 24, feels_like: 23, humidity: 52, pressure: 1010, wind: 2.6, desc: "few clouds", id: 801, country: "FR", coord: { lon: 2.3522, lat: 48.8566 } },
+    ahmedabad: { temp: 32, feels_like: 35, humidity: 60, pressure: 1006, wind: 4.2, desc: "scattered clouds", id: 802, country: "IN", coord: { lon: 72.5714, lat: 23.0225 } },
+  };
+
+  const mockPayload = () => {
+    const key = String(city || "").toLowerCase();
+    const sample = SAMPLE[key];
+    const temp = units === "imperial" ? 72 : 22;
+    const speed = units === "imperial" ? 5 : 2.3;
+    return sample
+      ? {
+          name: city,
+          sys: { country: sample.country },
+          dt: Math.floor(Date.now() / 1000),
+          main: { temp: units === "imperial" ? Math.round(sample.temp * 9/5 + 32) : sample.temp, feels_like: units === "imperial" ? Math.round(sample.feels_like * 9/5 + 32) : sample.feels_like, humidity: sample.humidity, pressure: sample.pressure },
+          weather: [{ id: sample.id, description: sample.desc }],
+          wind: { speed: units === "imperial" ? Math.round(sample.wind * 2.237 * 10)/10 : sample.wind },
+          coord: sample.coord,
+        }
+      : {
+          name: city,
+          sys: { country: "XX" },
+          dt: Math.floor(Date.now() / 1000),
+          main: { temp, feels_like: temp + 1, humidity: 55, pressure: 1012 },
+          weather: [{ id: 800, description: "clear sky" }],
+          wind: { speed },
+          coord: { lon: 0, lat: 0 },
+        };
+  };
 
   try {
     const start = Date.now();
@@ -30,6 +75,12 @@ export default async function handler(req, res) {
         const data = JSON.parse(text);
         message = data?.message || message;
       } catch {}
+
+      if (shouldMock && (status === 401 || status === 429)) {
+        const json = mockPayload();
+        res.setHeader("Server-Timing", `mock;dur=${Date.now() - start}`);
+        return res.status(200).json(json);
+      }
 
       const mapped =
         status === 401
@@ -50,6 +101,9 @@ export default async function handler(req, res) {
     res.setHeader("Server-Timing", `ow;dur=${Date.now() - start}`);
     return res.status(200).json(json);
   } catch (err) {
+    if (shouldMock) {
+      return res.status(200).json(mockPayload());
+    }
     return res.status(502).json({ message: "Network error — check connection" });
   }
 }

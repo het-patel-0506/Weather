@@ -1,6 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Header({ theme, onToggleTheme, onHelp }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   useEffect(() => {
     const root = document.documentElement;
     if (theme === "dark") root.classList.add("dark");
@@ -15,11 +17,11 @@ export default function Header({ theme, onToggleTheme, onHelp }) {
           type="button"
           onClick={onToggleTheme}
           className="inline-flex items-center justify-center h-9 w-9 rounded-full border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all focus:outline-none focus-visible:ring"
-          aria-pressed={theme === "dark"}
+          aria-pressed={mounted ? (theme === "dark") : undefined}
           aria-label="Toggle color theme"
           title="Toggle color theme"
         >
-          <span aria-hidden>{theme === "dark" ? "🌙" : "☀️"}</span>
+          <span aria-hidden>{mounted ? (theme === "dark" ? "🌙" : "☀️") : "○"}</span>
         </button>
         <button
           type="button"

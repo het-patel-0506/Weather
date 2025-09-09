@@ -24,6 +24,12 @@ export async function fetchWeather(city, units = "metric", signal) {
   const url = new URL(PROXY_URL, typeof window !== "undefined" ? window.location.origin : "http://localhost");
   url.searchParams.set("city", city.trim());
   url.searchParams.set("units", units);
+  try {
+    const forceMock =
+      (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("mock") === "1") ||
+      process.env.NEXT_PUBLIC_FORCE_MOCK === "1";
+    if (forceMock) url.searchParams.set("mock", "1");
+  } catch {}
 
   const res = await fetch(url.toString(), { signal });
   if (!res.ok) {
