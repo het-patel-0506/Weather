@@ -124,6 +124,12 @@ export function useWeather() {
     if (lastQuery) search(lastQuery);
   }, [lastQuery, search]);
 
+  const clear = useCallback(() => {
+    setData(null);
+    setError("");
+    setStatusMessage("");
+  }, []);
+
   return {
     theme,
     toggleTheme,
@@ -136,6 +142,7 @@ export function useWeather() {
     statusMessage,
     servedFromCache,
     retry,
+    clear,
     lastQuery,
     favorites,
     isFavorite,

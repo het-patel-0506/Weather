@@ -16,6 +16,7 @@ export default function WeatherArea({
   onShare,
   forecastDays = [],
   statusMessage,
+  servedFromCache,
 }) {
   const isBusy = !!loading;
   return (
@@ -31,6 +32,7 @@ export default function WeatherArea({
             unit={unit}
             onToggleUnit={onToggleUnit}
             onShare={onShare}
+            servedFromCache={servedFromCache}
           />
         ) : null}
         {loading ? (

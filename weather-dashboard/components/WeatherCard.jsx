@@ -11,7 +11,7 @@ function WeatherIcon({ id, description }) {
   );
 }
 
-export default function WeatherCard({ data, isFavorite, onToggleFavorite, unit = "C", onToggleUnit, onShare }) {
+export default function WeatherCard({ data, isFavorite, onToggleFavorite, unit = "C", onToggleUnit, onShare, servedFromCache }) {
   // Support both mapped internal shape and raw OpenWeather shape
   const cityName = data.city || data.name || "";
   const country = data.country || data.sys?.country || "";
@@ -41,7 +41,12 @@ export default function WeatherCard({ data, isFavorite, onToggleFavorite, unit =
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-xl md:text-2xl font-semibold">{cityName}{country ? `, ${country}` : ""}</h2>
-          <div className="text-xs text-slate-500 dark:text-slate-400">Last updated {updated.toLocaleString()}</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
+            <span>Last updated {updated.toLocaleString()}</span>
+            {servedFromCache ? (
+              <span className="inline-flex items-center rounded-full bg-slate-700/40 text-slate-200 px-2 py-0.5 text-[11px]" title="Served from cache">cached</span>
+            ) : null}
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <FavoriteButton isFavorite={isFavorite} onToggle={onToggleFavorite} />
