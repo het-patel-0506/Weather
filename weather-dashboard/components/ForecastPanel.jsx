@@ -1,7 +1,7 @@
 import { useState } from "react";
 import DayForecastCard from "./DayForecastCard";
 
-export default function ForecastPanel({ days = [], unit = "C" }) {
+export default function ForecastPanel({ days = [], unit = "C", theme = "dark" }) {
   const [selectedDay, setSelectedDay] = useState("Today");
 
   // Generate mock 5-day forecast if none provided
@@ -59,8 +59,14 @@ export default function ForecastPanel({ days = [], unit = "C" }) {
   ];
 
   return (
-    <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6">
-      <h3 className="text-lg font-semibold mb-6 text-white">5-Day Forecast</h3>
+    <div className={`backdrop-blur-sm rounded-xl p-6 transition-all duration-300 ${
+      theme === "dark" 
+        ? "bg-white/10 border border-white/20" 
+        : "bg-white/60 border border-slate-200/50"
+    }`}>
+      <h3 className={`text-lg font-semibold mb-6 transition-colors ${
+        theme === "dark" ? "text-white" : "text-slate-900"
+      }`}>5-Day Forecast</h3>
       <div className="space-y-3">
         {mockDays.map((day, index) => (
           <DayForecastCard
@@ -76,6 +82,7 @@ export default function ForecastPanel({ days = [], unit = "C" }) {
             unit={unit}
             isSelected={selectedDay === day.day}
             onSelect={setSelectedDay}
+            theme={theme}
           />
         ))}
       </div>

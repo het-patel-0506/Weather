@@ -1,6 +1,6 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-export default function TempChart({ data = [], unit = "C" }) {
+export default function TempChart({ data = [], unit = "C", theme = "dark" }) {
   // Generate mock hourly data if none provided
   const mockData = data.length > 0 ? data : [
     { time: "00:00", temp: 18, feels: 16, humidity: 85 },
@@ -16,12 +16,22 @@ export default function TempChart({ data = [], unit = "C" }) {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-lg p-3 shadow-2xl">
-          <p className="text-white text-sm font-medium">{`Time: ${label}`}</p>
-          <p className="text-white text-sm">
+        <div className={`backdrop-blur-xl rounded-lg p-3 shadow-2xl transition-all duration-300 ${
+          theme === "dark"
+            ? "bg-white/10 border border-white/20"
+            : "bg-white/90 border border-slate-200/70"
+        }`}>
+          <p className={`text-sm font-medium transition-colors ${
+            theme === "dark" ? "text-white" : "text-slate-900"
+          }`}>{`Time: ${label}`}</p>
+          <p className={`text-sm transition-colors ${
+            theme === "dark" ? "text-white" : "text-slate-900"
+          }`}>
             {`Temperature: ${payload[0]?.value || 0}°${unit}`}
           </p>
-          <p className="text-white/70 text-sm">
+          <p className={`text-sm transition-colors ${
+            theme === "dark" ? "text-white/70" : "text-slate-600"
+          }`}>
             {`Feels like: ${payload[1]?.value || 0}°${unit}`}
           </p>
         </div>
@@ -31,21 +41,30 @@ export default function TempChart({ data = [], unit = "C" }) {
   };
 
   return (
-    <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6">
-      <h3 className="text-lg font-semibold mb-4 text-white">24-Hour Temperature Trend</h3>
+    <div className={`backdrop-blur-sm rounded-xl p-6 transition-all duration-300 ${
+      theme === "dark" 
+        ? "bg-white/10 border border-white/20" 
+        : "bg-white/60 border border-slate-200/50"
+    }`}>
+      <h3 className={`text-lg font-semibold mb-4 transition-colors ${
+        theme === "dark" ? "text-white" : "text-slate-900"
+      }`}>24-Hour Temperature Trend</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={mockData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+            <CartesianGrid 
+              strokeDasharray="3 3" 
+              stroke={theme === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"} 
+            />
             <XAxis 
               dataKey="time" 
-              stroke="rgba(255,255,255,0.6)"
+              stroke={theme === "dark" ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)"}
               fontSize={12}
               tickLine={false}
               axisLine={false}
             />
             <YAxis 
-              stroke="rgba(255,255,255,0.6)"
+              stroke={theme === "dark" ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)"}
               fontSize={12}
               tickLine={false}
               axisLine={false}
@@ -77,11 +96,15 @@ export default function TempChart({ data = [], unit = "C" }) {
       <div className="flex items-center justify-center gap-6 mt-4 text-sm">
         <div className="flex items-center gap-2">
           <div className="w-3 h-0.5 bg-blue-500"></div>
-          <span className="text-white/70">Temperature</span>
+          <span className={`transition-colors ${
+            theme === "dark" ? "text-white/70" : "text-slate-600"
+          }`}>Temperature</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-0.5 bg-purple-500 border-dashed border-t-2 border-purple-500"></div>
-          <span className="text-white/70">Feels like</span>
+          <span className={`transition-colors ${
+            theme === "dark" ? "text-white/70" : "text-slate-600"
+          }`}>Feels like</span>
         </div>
       </div>
     </div>

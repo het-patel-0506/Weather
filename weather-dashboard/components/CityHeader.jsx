@@ -27,7 +27,8 @@ export default function CityHeader({
   unit = "C", 
   onToggleUnit, 
   onShare, 
-  servedFromCache 
+  servedFromCache,
+  theme = "dark"
 }) {
   const [mounted, setMounted] = useState(false);
   
@@ -39,8 +40,12 @@ export default function CityHeader({
     return (
       <div className="text-center py-12 animate-fade-in">
         <div className="text-6xl mb-4 animate-bounce">🌤️</div>
-        <h2 className="text-2xl font-semibold text-white mb-2">Welcome to Weather Pro</h2>
-        <p className="text-white/60">Search for a city to see detailed weather information</p>
+        <h2 className={`text-2xl font-semibold mb-2 transition-colors ${
+          theme === "dark" ? "text-white" : "text-slate-900"
+        }`}>Welcome to Weather Pro</h2>
+        <p className={`transition-colors ${
+          theme === "dark" ? "text-white/60" : "text-slate-600"
+        }`}>Search for a city to see detailed weather information</p>
       </div>
     );
   }
@@ -59,13 +64,21 @@ export default function CityHeader({
       {/* Header with city and actions */}
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-2 transition-all duration-300">
+          <h2 className={`text-3xl md:text-4xl font-bold mb-2 transition-all duration-300 ${
+            theme === "dark" ? "text-white" : "text-slate-900"
+          }`}>
             {cityName}{country ? `, ${country}` : ""}
           </h2>
-          <div className="flex items-center gap-4 text-white/60 text-sm">
+          <div className={`flex items-center gap-4 text-sm transition-colors ${
+            theme === "dark" ? "text-white/60" : "text-slate-600"
+          }`}>
             <span>Last updated {new Date(data.timestamp || Date.now()).toLocaleString()}</span>
             {servedFromCache && (
-              <span className="inline-flex items-center rounded-full bg-white/10 px-2 py-1 text-xs animate-pulse">
+              <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs animate-pulse transition-colors ${
+                theme === "dark" 
+                  ? "bg-white/10 text-white/80" 
+                  : "bg-slate-200/80 text-slate-700"
+              }`}>
                 cached
               </span>
             )}
@@ -76,7 +89,11 @@ export default function CityHeader({
           <button
             type="button"
             onClick={onShare}
-            className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-white/20 hover:bg-white/10 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 hover:scale-105"
+            className={`inline-flex items-center justify-center h-10 w-10 rounded-full border transition-all duration-200 focus:outline-none focus-visible:ring-2 hover:scale-105 ${
+              theme === "dark"
+                ? "border-white/20 hover:bg-white/10 focus-visible:ring-white/50"
+                : "border-slate-300/50 hover:bg-slate-100/80 focus-visible:ring-slate-400"
+            }`}
             aria-label="Share"
             title="Share"
           >
@@ -85,11 +102,17 @@ export default function CityHeader({
           <button
             type="button"
             onClick={onToggleUnit}
-            className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-white/20 hover:bg-white/10 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50 hover:scale-105"
+            className={`inline-flex items-center justify-center h-10 w-10 rounded-full border transition-all duration-200 focus:outline-none focus-visible:ring-2 hover:scale-105 ${
+              theme === "dark"
+                ? "border-white/20 hover:bg-white/10 focus-visible:ring-white/50"
+                : "border-slate-300/50 hover:bg-slate-100/80 focus-visible:ring-slate-400"
+            }`}
             aria-label="Toggle units"
             title="Toggle units"
           >
-            <span aria-hidden className="text-white font-medium">{unit === "F" ? "°F" : "°C"}</span>
+            <span aria-hidden className={`font-medium transition-colors ${
+              theme === "dark" ? "text-white" : "text-slate-700"
+            }`}>{unit === "F" ? "°F" : "°C"}</span>
           </button>
         </div>
       </div>
@@ -102,13 +125,19 @@ export default function CityHeader({
           </div>
         </div>
         <div className="flex-1">
-          <div className="text-7xl md:text-8xl font-extrabold text-white mb-2 transition-all duration-300">
+          <div className={`text-7xl md:text-8xl font-extrabold mb-2 transition-all duration-300 ${
+            theme === "dark" ? "text-white" : "text-slate-900"
+          }`}>
             {temp}°{unit}
           </div>
-          <p className="text-xl text-white/80 capitalize transition-all duration-300">
+          <p className={`text-xl capitalize transition-all duration-300 ${
+            theme === "dark" ? "text-white/80" : "text-slate-700"
+          }`}>
             {weather?.description}
           </p>
-          <p className="text-white/60 mt-1 transition-all duration-300">
+          <p className={`mt-1 transition-all duration-300 ${
+            theme === "dark" ? "text-white/60" : "text-slate-600"
+          }`}>
             Feels like {feels}°{unit}
           </p>
         </div>

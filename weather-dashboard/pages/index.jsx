@@ -42,7 +42,7 @@ export default function HomePage() {
   }, [data, loading, error]);
 
   const activeCity = (data && (data.city || data.name)) || lastQuery || "";
-  const defaultCities = ["New York City", "London", "Tokyo", "San Francisco, CA"];
+  const defaultCities = ["New York City", "London", "Paris", "Ahmedabad"];
   const cities = Array.from(
     new Set([...(favorites || []), ...(activeCity ? [activeCity] : []), ...defaultCities])
   );
@@ -133,7 +133,7 @@ export default function HomePage() {
                     />
                   )}
                   <div className="mt-6">
-                    {loading ? <HourlySkeleton /> : <HourlyForecast unit={unit} />}
+                    {loading ? <HourlySkeleton /> : <HourlyForecast unit={unit} theme={theme} />}
                   </div>
                   <div ref={resultRef} tabIndex={-1} aria-hidden className="sr-only">results-focus-sentinel</div>
                 </main>
@@ -143,7 +143,7 @@ export default function HomePage() {
             {/* Right Column - Forecast & Map */}
             <aside className="lg:col-span-4">
               <div className="space-y-6">
-                {loading ? <ForecastSkeleton /> : <ForecastPanel unit={unit} />}
+                        {loading ? <ForecastSkeleton /> : <ForecastPanel unit={unit} theme={theme} />}
                 {loading ? <MapSkeleton /> : (
                   <InteractiveMap 
                     city={data?.city || data?.name || "San Francisco, CA"}

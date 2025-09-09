@@ -107,7 +107,7 @@ export default function CitySearch({ cities = [], onSelect, onAdd, theme = "dark
       {showSuggestions && (searchTerm || filteredCities.length > 0) && (
                 <div className={`absolute z-50 w-full mt-1 backdrop-blur-xl rounded-lg shadow-2xl max-h-60 overflow-y-auto transition-all duration-300 ${
                   theme === "dark"
-                    ? "bg-white/20 border border-white/30"
+                    ? "bg-slate-800/95 border border-slate-600/50"
                     : "bg-white/95 border border-slate-200/70"
                 }`}>
           {filteredCities.length > 0 ? (
@@ -118,7 +118,7 @@ export default function CitySearch({ cities = [], onSelect, onAdd, theme = "dark
                 onClick={() => handleCitySelect(city)}
                         className={`w-full px-4 py-2 text-left transition-colors first:rounded-t-lg last:rounded-b-lg ${
                           theme === "dark"
-                            ? "text-white hover:bg-white/20"
+                            ? "text-white hover:bg-slate-700/80"
                             : "text-slate-900 hover:bg-slate-100/90"
                         }`}
               >
@@ -134,7 +134,7 @@ export default function CitySearch({ cities = [], onSelect, onAdd, theme = "dark
               onClick={handleAddCity}
                       className={`w-full px-4 py-2 text-left transition-colors rounded-lg ${
                         theme === "dark"
-                          ? "text-white hover:bg-white/20"
+                          ? "text-white hover:bg-slate-700/80"
                           : "text-slate-900 hover:bg-slate-100/90"
                       }`}
             >

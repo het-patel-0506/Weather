@@ -103,7 +103,7 @@ export default function MainWeatherPro({
         />
         <MetricCard 
           label="Visibility" 
-          value={visibility || "N/A"} 
+          value={visibility || "Clear"} 
           unit={visibility ? "km" : ""} 
           icon="👁️"
           theme={theme}
@@ -111,7 +111,7 @@ export default function MainWeatherPro({
       </div>
 
       {/* Interactive temperature chart */}
-      <TempChart unit={unit} />
+      <TempChart unit={unit} theme={theme} />
     </div>
   );
 }

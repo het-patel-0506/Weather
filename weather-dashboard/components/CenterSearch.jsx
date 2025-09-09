@@ -101,7 +101,7 @@ export default function CenterSearch({ onSearch, theme = "dark" }) {
   }, [isTyping]);
 
   return (
-    <div className="flex-1 max-w-md mx-8" ref={dropdownRef}>
+    <div className="flex-1 max-w-md mx-8 relative" ref={dropdownRef}>
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
           <span className={`transition-colors ${
@@ -139,14 +139,14 @@ export default function CenterSearch({ onSearch, theme = "dark" }) {
       {showSuggestions && (searchTerm.trim().length > 2) && (
         <div className={`absolute z-50 w-full mt-2 backdrop-blur-xl rounded-lg shadow-2xl max-h-60 overflow-y-auto transition-all duration-300 ${
           theme === "dark"
-            ? "bg-white/20 border border-white/30"
+            ? "bg-slate-800/95 border border-slate-600/50"
             : "bg-white/95 border border-slate-200/70"
-        }`}>
+        }`} style={{ width: '100%', maxWidth: '100%' }}>
           {suggestions.length > 0 ? (
             <>
               <div className={`px-4 py-2 text-xs font-medium border-b transition-colors ${
                 theme === "dark" 
-                  ? "text-white/60 border-white/20" 
+                  ? "text-white/80 border-slate-600/50" 
                   : "text-slate-500 border-slate-200/50"
               }`}>
                 Did you mean?
@@ -158,18 +158,18 @@ export default function CenterSearch({ onSearch, theme = "dark" }) {
                   onClick={() => handleSuggestionClick(city)}
                   className={`w-full px-4 py-3 text-left transition-colors first:rounded-t-lg last:rounded-b-lg ${
                     theme === "dark"
-                      ? "text-white hover:bg-white/20"
+                      ? "text-white hover:bg-slate-700/80"
                       : "text-slate-900 hover:bg-slate-100/90"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <span className={`text-lg transition-colors ${
-                      theme === "dark" ? "text-white/60" : "text-slate-400"
+                      theme === "dark" ? "text-white/80" : "text-slate-400"
                     }`} aria-hidden>📍</span>
                     <div>
                       <div className="font-medium">{city}</div>
                       <div className={`text-xs transition-colors ${
-                        theme === "dark" ? "text-white/50" : "text-slate-500"
+                        theme === "dark" ? "text-white/70" : "text-slate-500"
                       }`}>
                         Click to search
                       </div>
@@ -180,7 +180,7 @@ export default function CenterSearch({ onSearch, theme = "dark" }) {
             </>
           ) : searchTerm.trim().length > 2 ? (
             <div className={`px-4 py-3 text-center transition-colors ${
-              theme === "dark" ? "text-white/60" : "text-slate-500"
+              theme === "dark" ? "text-white/80" : "text-slate-500"
             }`}>
               <div className="text-sm">No suggestions found</div>
               <div className="text-xs mt-1">Press Enter to search anyway</div>

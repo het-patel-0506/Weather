@@ -11,7 +11,8 @@ export default function DayForecastCard({
   wind, 
   unit = "C",
   isSelected = false,
-  onSelect 
+  onSelect,
+  theme = "dark"
 }) {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -24,21 +25,29 @@ export default function DayForecastCard({
       className={`w-full p-4 rounded-lg transition-all duration-300 ${
         isSelected
           ? "bg-amber-400/20 border border-amber-400/50 text-amber-200 shadow-[0_0_0_1px_rgba(255,155,61,.3)]"
-          : "bg-white/5 border border-white/10 text-white hover:bg-white/10"
+          : theme === "dark"
+            ? "bg-white/10 border border-white/20 text-white hover:bg-white/20"
+            : "bg-white/80 border border-slate-200/50 text-slate-900 hover:bg-slate-100/80"
       } ${isHovered ? "scale-105 shadow-lg" : ""}`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="text-center min-w-[60px]">
             <div className="text-sm font-medium">{day}</div>
-            <div className="text-xs text-white/60">{date}</div>
+            <div className={`text-xs transition-colors ${
+              theme === "dark" ? "text-white/60" : "text-slate-500"
+            }`}>{date}</div>
           </div>
           <div className="text-3xl transition-transform duration-200 hover:scale-110" aria-hidden>
             {icon}
           </div>
           <div className="min-w-[100px]">
-            <div className="text-sm text-white/80 capitalize">{condition}</div>
-            <div className="text-xs text-white/60">
+            <div className={`text-sm capitalize transition-colors ${
+              theme === "dark" ? "text-white/80" : "text-slate-700"
+            }`}>{condition}</div>
+            <div className={`text-xs transition-colors ${
+              theme === "dark" ? "text-white/60" : "text-slate-500"
+            }`}>
               {precipitation}% • {wind} {unit === "F" ? "mph" : "m/s"}
             </div>
           </div>
@@ -48,7 +57,9 @@ export default function DayForecastCard({
             <div className="text-lg font-semibold">
               {high}°{unit}
             </div>
-            <div className="text-sm text-white/60">
+            <div className={`text-sm transition-colors ${
+              theme === "dark" ? "text-white/60" : "text-slate-500"
+            }`}>
               {low}°{unit}
             </div>
           </div>

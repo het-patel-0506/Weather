@@ -34,6 +34,12 @@ export default async function handler(req, res) {
     london: { temp: 21, feels_like: 20, humidity: 58, pressure: 1013, wind: 3.1, desc: "clear sky", id: 800, country: "GB", coord: { lon: -0.1276, lat: 51.5072 } },
     paris: { temp: 24, feels_like: 23, humidity: 52, pressure: 1010, wind: 2.6, desc: "few clouds", id: 801, country: "FR", coord: { lon: 2.3522, lat: 48.8566 } },
     ahmedabad: { temp: 32, feels_like: 35, humidity: 60, pressure: 1006, wind: 4.2, desc: "scattered clouds", id: 802, country: "IN", coord: { lon: 72.5714, lat: 23.0225 } },
+    "san francisco": { temp: 18, feels_like: 17, humidity: 75, pressure: 1015, wind: 4.8, desc: "fog", id: 741, country: "US", coord: { lon: -122.4194, lat: 37.7749 } },
+    "san francisco, ca": { temp: 18, feels_like: 17, humidity: 75, pressure: 1015, wind: 4.8, desc: "fog", id: 741, country: "US", coord: { lon: -122.4194, lat: 37.7749 } },
+    tokyo: { temp: 25, feels_like: 27, humidity: 65, pressure: 1010, wind: 3.2, desc: "partly cloudy", id: 802, country: "JP", coord: { lon: 139.6917, lat: 35.6895 } },
+    "new york": { temp: 22, feels_like: 24, humidity: 55, pressure: 1018, wind: 2.8, desc: "clear sky", id: 800, country: "US", coord: { lon: -74.0060, lat: 40.7128 } },
+    "new york city": { temp: 22, feels_like: 24, humidity: 55, pressure: 1018, wind: 2.8, desc: "clear sky", id: 800, country: "US", coord: { lon: -74.0060, lat: 40.7128 } },
+    ottawa: { temp: 19, feels_like: 18, humidity: 42, pressure: 1014, wind: 2.7, desc: "scattered clouds", id: 802, country: "CA", coord: { lon: -75.6972, lat: 45.4215 } },
   };
 
   const mockPayload = () => {
