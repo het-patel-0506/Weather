@@ -16,7 +16,7 @@ export default function WeatherArea({
   forecastDays = [],
 }) {
   return (
-    <section role="region" aria-live="polite" className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <section role="region" aria-live="polite" className="grid grid-cols-1 lg:grid-cols-12 gap-6" aria-label="Weather results">
       <div className="lg:col-span-8 relative">
         {!data && !loading && !error ? <EmptyState /> : null}
         {data ? (
