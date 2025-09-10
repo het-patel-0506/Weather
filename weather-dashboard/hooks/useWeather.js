@@ -88,9 +88,9 @@ export function useWeather() {
   const favoriteSet = useMemo(() => new Set(favorites), [favorites]);
   const isFavorite = data?.city ? favoriteSet.has(data.city) : false;
 
-  const toggleFavorite = useCallback(() => {
-    if (!data?.city) return;
-    const name = data.city;
+  const toggleFavorite = useCallback((cityName) => {
+    const name = cityName || data?.city;
+    if (!name) return;
     setFavorites((prev) => {
       const set = new Set(prev);
       if (set.has(name)) set.delete(name);

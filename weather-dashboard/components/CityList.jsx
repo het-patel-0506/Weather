@@ -31,9 +31,6 @@ export default function CityList({ cities = [], activeCity = "", onSelect, onTog
   const isFavorite = (city) => favorites.includes(city);
   const isActive = (city) => activeCity && city.toLowerCase() === activeCity.toLowerCase();
 
-  // Combine recent cities with all cities, removing duplicates
-  const allCities = Array.from(new Set([...recentCities, ...cities]));
-
   return (
     <div className="space-y-4">
       {/* Recent Cities */}
@@ -58,27 +55,6 @@ export default function CityList({ cities = [], activeCity = "", onSelect, onTog
           </div>
         </div>
       )}
-
-      {/* All Cities */}
-      <div>
-        <h3 className={`text-sm font-medium mb-2 transition-colors ${
-          theme === "dark" ? "text-white/80" : "text-slate-700"
-        }`}>All Cities</h3>
-        <div className="space-y-1 max-h-64 overflow-y-auto">
-          {allCities.map((city, index) => (
-            <CityListItem
-              key={`all-${index}`}
-              city={city}
-              isActive={isActive(city)}
-              isFavorite={isFavorite(city)}
-              onSelect={() => handleCitySelect(city)}
-              onToggleFavorite={(e) => handleToggleFavorite(e, city)}
-              showRecent={false}
-              theme={theme}
-            />
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

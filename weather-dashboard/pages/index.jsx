@@ -86,15 +86,7 @@ export default function HomePage() {
                   onAdd={(city) => search(city)}
                   favorites={favorites}
                   theme={theme}
-                  onToggleFavorite={(city) => {
-                    const newFavorites = favorites.includes(city)
-                      ? favorites.filter(f => f !== city)
-                      : [...favorites, city];
-                    // Update favorites in localStorage
-                    localStorage.setItem('favorites', JSON.stringify(newFavorites));
-                    // Trigger a re-render by updating the hook
-                    window.location.reload();
-                  }}
+                  onToggleFavorite={(city) => toggleFavorite(city)}
                 />
               </div>
             </aside>
@@ -123,7 +115,7 @@ export default function HomePage() {
                       error={error}
                       data={data}
                       isFavorite={isFavorite}
-                      onToggleFavorite={toggleFavorite}
+                      onToggleFavorite={() => toggleFavorite()}
                       unit={unit}
                       onToggleUnit={toggleUnit}
                       onShare={share}
