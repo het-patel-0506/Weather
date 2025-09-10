@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export default function CityList({ cities = [], activeCity = "", onSelect, onToggleFavorite, favorites = [], theme = "dark" }) {
+export default function CityList({ cities = [], activeCity = "", onSelect, onToggleFavorite, favorites = [], theme = "dark", refreshTrigger = 0 }) {
   const [recentCities, setRecentCities] = useState([]);
 
   useEffect(() => {
@@ -8,11 +8,29 @@ export default function CityList({ cities = [], activeCity = "", onSelect, onTog
     const stored = localStorage.getItem('recentCities');
     if (stored) {
       try {
-        setRecentCities(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        setRecentCities(parsed);
       } catch (e) {
         console.warn('Failed to parse recent cities from localStorage');
       }
     }
+  }, [refreshTrigger]);
+
+  // Listen for storage changes to update recent cities
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const stored = localStorage.getItem('recentCities');
+      if (stored) {
+        try {
+          setRecentCities(JSON.parse(stored));
+        } catch (e) {
+          console.warn('Failed to parse recent cities from localStorage');
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   const handleCitySelect = (city) => {

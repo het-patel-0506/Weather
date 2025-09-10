@@ -1,7 +1,7 @@
 import CitySearch from "./CitySearch";
 import CityList from "./CityList";
 
-export default function LeftNav({ cities = [], activeCity = "", onSelect, onAdd, favorites = [], onToggleFavorite, theme = "dark" }) {
+export default function LeftNav({ cities = [], activeCity = "", onSelect, onAdd, favorites = [], onToggleFavorite, theme = "dark", refreshTrigger = 0 }) {
   return (
     <nav aria-label="Cities" className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -24,6 +24,7 @@ export default function LeftNav({ cities = [], activeCity = "", onSelect, onAdd,
         onToggleFavorite={onToggleFavorite}
         favorites={favorites}
         theme={theme}
+        refreshTrigger={refreshTrigger}
       />
     </nav>
   );

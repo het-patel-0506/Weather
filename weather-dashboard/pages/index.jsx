@@ -10,6 +10,7 @@ import HourlyForecast from "../components/HourlyForecast";
 import ForecastPanel from "../components/ForecastPanel";
 import InteractiveMap from "../components/InteractiveMap";
 import { WeatherCardSkeleton, ChartSkeleton, ForecastSkeleton, HourlySkeleton, MapSkeleton } from "../components/LoadingSkeletons";
+import FloatingError from "../components/FloatingError";
 import { useWeather } from "../hooks/useWeather";
 
 export default function HomePage() {
@@ -34,12 +35,27 @@ export default function HomePage() {
 
   const resultRef = useRef(null);
   const [mounted, setMounted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   useEffect(() => setMounted(true), []);
   useEffect(() => {
     if (data && !loading && !error) {
       resultRef.current?.focus?.();
     }
   }, [data, loading, error]);
+
+  useEffect(() => {
+    if (error) {
+      setErrorMessage(error);
+    }
+  }, [error]);
+
+  // Trigger refresh when data changes to update recent cities
+  useEffect(() => {
+    if (data) {
+      setRefreshTrigger(prev => prev + 1);
+    }
+  }, [data]);
 
   const activeCity = (data && (data.city || data.name)) || lastQuery || "";
   const defaultCities = ["New York City", "London", "Paris", "Ahmedabad"];
@@ -48,11 +64,30 @@ export default function HomePage() {
   );
 
   return (
-    <div className={`min-h-screen transition-all duration-300 ${
-      theme === "dark" 
-        ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white" 
-        : "bg-gradient-to-br from-slate-100 via-slate-50 to-slate-200 text-slate-900"
-    }`}>
+    <>
+      {/* Ensure dark theme is applied immediately on page load */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              const theme = localStorage.getItem('theme') || 'dark';
+              if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.documentElement.style.setProperty('--bg-primary', 'rgb(15, 23, 42)');
+                document.documentElement.style.setProperty('--bg-secondary', 'rgb(30, 41, 59)');
+                document.documentElement.style.setProperty('--text-primary', 'rgb(255, 255, 255)');
+                document.documentElement.style.setProperty('--text-secondary', 'rgba(255, 255, 255, 0.7)');
+              }
+            })();
+          `,
+        }}
+      />
+      <div className={`min-h-screen transition-all duration-300 ${
+        theme === "dark" 
+          ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white" 
+          : "bg-gradient-to-br from-slate-100 via-slate-50 to-slate-200 text-slate-900"
+      }`}>
+        
       {/* Background pattern */}
       <div className="fixed inset-0 opacity-40" style={{
         backgroundImage: theme === "dark" 
@@ -87,6 +122,7 @@ export default function HomePage() {
                   favorites={favorites}
                   theme={theme}
                   onToggleFavorite={(city) => toggleFavorite(city)}
+                  refreshTrigger={refreshTrigger}
                 />
               </div>
             </aside>
@@ -125,7 +161,7 @@ export default function HomePage() {
                     />
                   )}
                   <div className="mt-6">
-                    {loading ? <HourlySkeleton /> : <HourlyForecast unit={unit} theme={theme} />}
+                    {loading ? <HourlySkeleton /> : <HourlyForecast unit={unit} theme={theme} hasData={!!data} />}
                   </div>
                   <div ref={resultRef} tabIndex={-1} aria-hidden className="sr-only">results-focus-sentinel</div>
                 </main>
@@ -150,7 +186,15 @@ export default function HomePage() {
         ) : null}
         <Footer />
       </div>
+      
+      {/* Floating Error Message */}
+      <FloatingError 
+        message={errorMessage} 
+        onClose={() => setErrorMessage("")} 
+        theme={theme} 
+      />
     </div>
+    </>
   );
 }
 

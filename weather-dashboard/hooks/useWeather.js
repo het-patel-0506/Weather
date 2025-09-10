@@ -5,7 +5,7 @@ import { fetchWeather as fetchWeatherProxy } from "../lib/api";
 const cache = new Map(); // key: `${city}|${units}` -> mapped weather
 
 export function useWeather() {
-  const [theme, setTheme] = useLocalStorage("theme", "light");
+  const [theme, setTheme] = useLocalStorage("theme", "dark");
   const [favorites, setFavorites] = useLocalStorage("favorites", []);
   const [lastQuery, setLastQuery] = useLocalStorage("lastSearched", "");
   const [unit, setUnit] = useLocalStorage("unit", "C");
@@ -77,6 +77,20 @@ export function useWeather() {
   const search = useCallback(
     (city) => {
       if (!city) return;
+      
+      // Add to recent cities
+      const stored = localStorage.getItem('recentCities');
+      let recentCities = [];
+      if (stored) {
+        try {
+          recentCities = JSON.parse(stored);
+        } catch (e) {
+          console.warn('Failed to parse recent cities from localStorage');
+        }
+      }
+      const updatedRecent = [city, ...recentCities.filter(c => c !== city)].slice(0, 5);
+      localStorage.setItem('recentCities', JSON.stringify(updatedRecent));
+      
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => {
         void doFetch(city, unit);
