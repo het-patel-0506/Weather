@@ -2,6 +2,26 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useMemo } from 'react';
 
 export default function TempChart({ data = [], unit = "C", theme = "dark", weatherData = null }) {
+  // Early return if no weather data and no chart data - before any hooks
+  if (!weatherData && data.length === 0) {
+    return (
+      <div className={`backdrop-blur-sm rounded-xl p-6 transition-all duration-300 ${
+        theme === "dark" 
+          ? "bg-white/10 border border-white/20" 
+          : "bg-white/60 border border-slate-200/50"
+      }`}>
+        <h3 className={`text-lg font-semibold mb-4 transition-colors ${
+          theme === "dark" ? "text-white" : "text-slate-900"
+        }`}>24-Hour Temperature Trend</h3>
+        <div className={`text-center py-8 transition-colors ${
+          theme === "dark" ? "text-white/60" : "text-slate-600"
+        }`}>
+          Select a city to view temperature trends
+        </div>
+      </div>
+    );
+  }
+
   // Convert temperature based on unit
   const convertTemp = (tempC) => {
     if (unit === "F") {
@@ -30,8 +50,9 @@ export default function TempChart({ data = [], unit = "C", theme = "dark", weath
     const currentFeelsLike = weatherData.feels_like;
     
     // Calculate realistic min/max based on current temp
-    const minTemp = currentTemp - 8; // 8 degrees below current
-    const maxTemp = currentTemp + 2; // 2 degrees above current
+    // Use a more realistic daily temperature range
+    const minTemp = currentTemp - 4; // 4 degrees below current (more realistic)
+    const maxTemp = currentTemp + 3; // 3 degrees above current (more realistic)
     
     
     // Generate hourly data from 00:00 to 23:59
@@ -76,8 +97,10 @@ export default function TempChart({ data = [], unit = "C", theme = "dark", weath
         feelsLike = Math.max(minTemp - 2, Math.min(maxTemp + 2, feelsLike));
       }
       
-      const finalTemp = Math.round(convertTemp(temp));
-      const finalFeels = Math.round(convertTemp(feelsLike));
+      // The temperatures are already in the correct unit from the API
+      // So we don't need to convert them
+      const finalTemp = Math.round(temp);
+      const finalFeels = Math.round(feelsLike);
       
       
       hourlyData.push({
@@ -93,26 +116,6 @@ export default function TempChart({ data = [], unit = "C", theme = "dark", weath
 
   // Use provided data or generated data
   const chartData = data.length > 0 ? data : generateDynamicData;
-
-  // Show message if no data available
-  if (!weatherData && chartData.length === 0) {
-    return (
-      <div className={`backdrop-blur-sm rounded-xl p-6 transition-all duration-300 ${
-        theme === "dark" 
-          ? "bg-white/10 border border-white/20" 
-          : "bg-white/60 border border-slate-200/50"
-      }`}>
-        <h3 className={`text-lg font-semibold mb-4 transition-colors ${
-          theme === "dark" ? "text-white" : "text-slate-900"
-        }`}>24-Hour Temperature Trend</h3>
-        <div className={`text-center py-8 transition-colors ${
-          theme === "dark" ? "text-white/60" : "text-slate-600"
-        }`}>
-          Select a city to view temperature trends
-        </div>
-      </div>
-    );
-  }
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
