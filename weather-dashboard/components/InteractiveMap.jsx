@@ -22,6 +22,7 @@ export default function InteractiveMap({
   city = "San Francisco, CA", 
   coordinates = { lat: 37.7749, lon: -122.4194 },
   weatherData = null,
+  theme = "dark",
   apiKey = null,
   mapLayers = { rainfall: false, radar: false, temperature: false },
   onLocationSelect = null
@@ -83,10 +84,14 @@ export default function InteractiveMap({
 
   if (!mounted) {
     return (
-      <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6">
-        <h3 className="text-lg font-semibold mb-4 text-white">Interactive Precipitation Map</h3>
+      <div className={`backdrop-blur-sm rounded-xl p-6 transition-all duration-300 ${
+        theme === 'dark' 
+          ? 'bg-white/5 border border-white/10' 
+          : 'bg-white border border-slate-200/50'
+      }`}>
+        <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Interactive Precipitation Map</h3>
         <div className="aspect-square bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl flex items-center justify-center">
-          <div className="text-center text-white/60">
+          <div className={`text-center ${theme === 'dark' ? 'text-white/60' : 'text-gray-600'}`}>
             <div className="text-4xl mb-2 animate-pulse">🗺️</div>
             <div className="text-sm">Loading map...</div>
           </div>
@@ -96,13 +101,17 @@ export default function InteractiveMap({
   }
 
   return (
-    <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-6">
+    <div className={`backdrop-blur-sm rounded-xl p-6 transition-all duration-300 ${
+      theme === 'dark' 
+        ? 'bg-white/5 border border-white/10' 
+        : 'bg-white border border-slate-200/50'
+    }`}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-white">Interactive Precipitation Map</h3>
+        <h3 className={`text-lg font-semibold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Interactive Precipitation Map</h3>
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="px-3 py-1 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-colors text-xs text-white"
+            className={`px-3 py-1 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-colors text-xs ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}
             onClick={() => setMapCenter([coordinates.lat, coordinates.lon])}
           >
             Center
@@ -194,7 +203,7 @@ export default function InteractiveMap({
       </div>
       
       {/* Map controls */}
-      <div className="flex justify-between items-center mt-4 text-white/60 text-sm">
+      <div className={`flex justify-between items-center mt-4 text-sm ${theme === 'dark' ? 'text-white/60' : 'text-gray-600'}`}>
         <div className="flex items-center gap-4">
           <span>Satellite</span>
           <span>•</span>
@@ -205,7 +214,7 @@ export default function InteractiveMap({
         <div className="flex items-center gap-2">
           <button
             type="button"
-            className="px-3 py-1 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-colors text-xs"
+            className={`px-3 py-1 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition-colors text-xs ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}
           >
             Layers
           </button>

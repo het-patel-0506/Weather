@@ -344,6 +344,7 @@ export default function HomePage() {
                     city={data?.city || data?.name || "San Francisco, CA"}
                     coordinates={data?.coord || { lat: 37.7749, lon: -122.4194 }}
                     weatherData={data}
+                    theme={theme}
                     apiKey={process.env.NEXT_PUBLIC_WEATHER_API_KEY}
                     mapLayers={mapLayers}
                     onLocationSelect={handleMapLocationSelect}

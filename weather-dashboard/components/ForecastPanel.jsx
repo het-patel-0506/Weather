@@ -78,7 +78,7 @@ export default function ForecastPanel({ days = [], unit = "C", theme = "dark", w
     <div className={`backdrop-blur-sm rounded-xl p-6 transition-all duration-300 ${
       theme === "dark" 
         ? "bg-white/10 border border-white/20" 
-        : "bg-white/60 border border-slate-200/50"
+        : "bg-white border border-slate-200/50"
     }`}>
       <h3 className={`text-lg font-semibold mb-6 transition-colors ${
         theme === "dark" ? "text-white" : "text-slate-900"
