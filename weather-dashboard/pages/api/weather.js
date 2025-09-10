@@ -12,11 +12,20 @@ export default async function handler(req, res) {
     process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY ||
     "";
 
+  // Normalize the API key to avoid common issues introduced by env configuration
+  if (apiKey) {
+    // Trim whitespace/newlines and remove surrounding quotes if present
+    apiKey = apiKey.trim().replace(/^"|"$/g, "").replace(/^'|'$/g, "");
+  }
+
+  // Minimal diagnostics (length only) to validate configuration without leaking secrets
+  console.log("OWM key length:", apiKey ? apiKey.length : 0);
+
   if (!apiKey && process.env.NODE_ENV !== "production" && typeof req.query.key === "string") {
     apiKey = req.query.key; // Dev-only convenience
   }
   if (!apiKey) {
-    return res.status(500).json({ message: "Server API key not configured" });
+    return res.status(500).json({ message: "API key not configured - please set your OpenWeatherMap API key" });
   }
   if (!city || typeof city !== "string") {
     return res.status(400).json({ message: "City is required" });
@@ -26,6 +35,9 @@ export default async function handler(req, res) {
   url.searchParams.set("q", city);
   url.searchParams.set("appid", apiKey);
   url.searchParams.set("units", units === "imperial" ? "imperial" : "metric");
+
+  // Avoid logging sensitive data like full keys or URLs containing keys
+  console.log("Requesting weather", { city, units, keyLen: apiKey.length });
 
   const shouldMock =
     process.env.NODE_ENV !== "production" && (process.env.MOCK_WEATHER === "1" || mock === "1");
@@ -86,6 +98,13 @@ export default async function handler(req, res) {
     const start = Date.now();
     const owRes = await fetch(url.toString());
     const text = await owRes.text();
+    
+    console.log("OpenWeatherMap Response:", {
+      status: owRes.status,
+      statusText: owRes.statusText,
+      responseLength: text.length,
+      responsePreview: text.substring(0, 200)
+    });
 
     // Map common errors to friendly messages
     if (!owRes.ok) {
@@ -96,10 +115,12 @@ export default async function handler(req, res) {
         message = data?.message || message;
       } catch {}
 
-      if (shouldMock && (status === 401 || status === 429)) {
-        const json = mockPayload();
-        res.setHeader("Server-Timing", `mock;dur=${Date.now() - start}`);
-        return res.status(200).json(json);
+      // Don't fall back to mock data - return proper error messages
+      if (status === 401) {
+        return res.status(401).json({ message: "API key invalid - please check your OpenWeatherMap API key" });
+      }
+      if (status === 429) {
+        return res.status(429).json({ message: "Rate limit reached - please try again later" });
       }
 
       const mapped =
@@ -121,9 +142,7 @@ export default async function handler(req, res) {
     res.setHeader("Server-Timing", `ow;dur=${Date.now() - start}`);
     return res.status(200).json(json);
   } catch (err) {
-    if (shouldMock) {
-      return res.status(200).json(mockPayload());
-    }
-    return res.status(502).json({ message: "Network error — check connection" });
+    console.error("Network error:", err);
+    return res.status(500).json({ message: "Network error - please check your connection" });
   }
 }

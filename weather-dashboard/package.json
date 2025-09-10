@@ -36,6 +36,7 @@
     "jest-environment-jsdom": "^30.1.2",
     "tailwindcss": "^4",
     "typescript": "^5",
+    "vercel": "^47.0.7",
     "vitest": "^2",
     "whatwg-fetch": "^3.6.20"
   }
