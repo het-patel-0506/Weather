@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 
-export default function HourlyForecast({ hours = [], unit = "C", theme = "dark", hasData = false }) {
+export default function HourlyForecast({ hours = [], unit = "C", theme = "dark", hasData = false, weatherData = null }) {
   const [mockHours, setMockHours] = useState([]);
 
   // Don't show if no data
@@ -29,20 +29,54 @@ export default function HourlyForecast({ hours = [], unit = "C", theme = "dark",
         hour12: true 
       }).replace(':00', '');
       
-      // Generate stable temperature variation (in Celsius)
-      const baseTempC = 24;
+      // Generate stable temperature variation based on real current temp
+      // The weatherData.temperature is already in the correct unit from the API
+      const currentTemp = weatherData?.temperature || 24; // Use real current temp or fallback
       const variation = Math.sin(i * 0.5) * 3 + Math.sin(seed + i) * 2;
-      const tempC = Math.round(baseTempC + variation);
+      const temp = currentTemp + variation;
       
-      // Generate stable weather conditions
-      const conditions = [
-        { icon: "☀️", condition: "Sunny", precipitation: 0 },
-        { icon: "⛅", condition: "Partly Cloudy", precipitation: 15 },
-        { icon: "🌤️", condition: "Mostly Cloudy", precipitation: 25 },
-        { icon: "🌧️", condition: "Light Rain", precipitation: 60 },
-        { icon: "🌦️", condition: "Drizzle", precipitation: 35 },
-        { icon: "☁️", condition: "Cloudy", precipitation: 10 },
-      ];
+      // Generate realistic weather conditions based on time of day
+      const hourOfDay = hourTime.getHours();
+      const isNight = hourOfDay >= 20 || hourOfDay <= 6; // 8 PM to 6 AM
+      const isEvening = hourOfDay >= 18 && hourOfDay < 20; // 6 PM to 8 PM
+      const isMorning = hourOfDay >= 6 && hourOfDay < 10; // 6 AM to 10 AM
+      
+      let conditions;
+      if (isNight) {
+        // Night conditions
+        conditions = [
+          { icon: "🌙", condition: "Clear", precipitation: 0 },
+          { icon: "☁️", condition: "Cloudy", precipitation: 10 },
+          { icon: "🌧️", condition: "Light Rain", precipitation: 60 },
+          { icon: "🌦️", condition: "Drizzle", precipitation: 35 },
+          { icon: "🌫️", condition: "Fog", precipitation: 5 },
+        ];
+      } else if (isEvening) {
+        // Evening conditions
+        conditions = [
+          { icon: "🌅", condition: "Partly Cloudy", precipitation: 15 },
+          { icon: "🌤️", condition: "Mostly Cloudy", precipitation: 25 },
+          { icon: "☁️", condition: "Cloudy", precipitation: 10 },
+          { icon: "🌧️", condition: "Light Rain", precipitation: 60 },
+        ];
+      } else if (isMorning) {
+        // Morning conditions
+        conditions = [
+          { icon: "🌅", condition: "Partly Cloudy", precipitation: 15 },
+          { icon: "☀️", condition: "Sunny", precipitation: 0 },
+          { icon: "🌤️", condition: "Mostly Cloudy", precipitation: 25 },
+          { icon: "🌫️", condition: "Fog", precipitation: 5 },
+        ];
+      } else {
+        // Day conditions
+        conditions = [
+          { icon: "☀️", condition: "Sunny", precipitation: 0 },
+          { icon: "⛅", condition: "Partly Cloudy", precipitation: 15 },
+          { icon: "🌤️", condition: "Mostly Cloudy", precipitation: 25 },
+          { icon: "🌧️", condition: "Light Rain", precipitation: 60 },
+          { icon: "🌦️", condition: "Drizzle", precipitation: 35 },
+        ];
+      }
       
       // Use stable selection based on hour and seed
       const conditionIndex = Math.floor(Math.abs(Math.sin(seed + i * 0.3)) * conditions.length);
@@ -50,8 +84,8 @@ export default function HourlyForecast({ hours = [], unit = "C", theme = "dark",
       
       hours.push({
         time: timeStr,
-        tempC: tempC, // Store in Celsius
-        temp: convertTemp(tempC), // Convert based on unit
+        tempC: temp, // Store the temperature
+        temp: Math.round(temp), // Use temperature directly (already in correct unit)
         icon: condition.icon,
         condition: condition.condition,
         precipitation: condition.precipitation
@@ -64,7 +98,7 @@ export default function HourlyForecast({ hours = [], unit = "C", theme = "dark",
   // Memoize the generated hours to prevent unnecessary regeneration
   const generatedHours = useMemo(() => {
     return generateDynamicHours();
-  }, []); // Only generate once
+  }, [weatherData]); // Regenerate when weather data changes
 
   // Generate or update mock hours when unit changes
   useEffect(() => {

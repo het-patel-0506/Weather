@@ -78,18 +78,20 @@ export function useWeather() {
     (city) => {
       if (!city) return;
       
-      // Add to recent cities
-      const stored = localStorage.getItem('recentCities');
-      let recentCities = [];
-      if (stored) {
-        try {
-          recentCities = JSON.parse(stored);
-        } catch (e) {
-          console.warn('Failed to parse recent cities from localStorage');
+      // Add to recent cities (only on client side)
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem('recentCities');
+        let recentCities = [];
+        if (stored) {
+          try {
+            recentCities = JSON.parse(stored);
+          } catch (e) {
+            console.warn('Failed to parse recent cities from localStorage');
+          }
         }
+        const updatedRecent = [city, ...recentCities.filter(c => c !== city)].slice(0, 5);
+        localStorage.setItem('recentCities', JSON.stringify(updatedRecent));
       }
-      const updatedRecent = [city, ...recentCities.filter(c => c !== city)].slice(0, 5);
-      localStorage.setItem('recentCities', JSON.stringify(updatedRecent));
       
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => {

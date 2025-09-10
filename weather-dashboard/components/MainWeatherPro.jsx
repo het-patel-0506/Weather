@@ -110,8 +110,8 @@ export default function MainWeatherPro({
         />
       </div>
 
-      {/* Interactive temperature chart */}
-      <TempChart unit={unit} theme={theme} />
+              {/* Interactive temperature chart */}
+              <TempChart unit={unit} theme={theme} weatherData={data} />
     </div>
   );
 }

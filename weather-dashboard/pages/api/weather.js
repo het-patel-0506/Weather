@@ -31,15 +31,15 @@ export default async function handler(req, res) {
     process.env.NODE_ENV !== "production" && (process.env.MOCK_WEATHER === "1" || mock === "1");
 
   const SAMPLE = {
-    london: { temp: 21, feels_like: 20, humidity: 58, pressure: 1013, wind: 3.1, desc: "clear sky", id: 800, country: "GB", coord: { lon: -0.1276, lat: 51.5072 } },
-    paris: { temp: 24, feels_like: 23, humidity: 52, pressure: 1010, wind: 2.6, desc: "few clouds", id: 801, country: "FR", coord: { lon: 2.3522, lat: 48.8566 } },
-    ahmedabad: { temp: 32, feels_like: 35, humidity: 60, pressure: 1006, wind: 4.2, desc: "scattered clouds", id: 802, country: "IN", coord: { lon: 72.5714, lat: 23.0225 } },
-    "san francisco": { temp: 18, feels_like: 17, humidity: 75, pressure: 1015, wind: 4.8, desc: "fog", id: 741, country: "US", coord: { lon: -122.4194, lat: 37.7749 } },
-    "san francisco, ca": { temp: 18, feels_like: 17, humidity: 75, pressure: 1015, wind: 4.8, desc: "fog", id: 741, country: "US", coord: { lon: -122.4194, lat: 37.7749 } },
-    tokyo: { temp: 25, feels_like: 27, humidity: 65, pressure: 1010, wind: 3.2, desc: "partly cloudy", id: 802, country: "JP", coord: { lon: 139.6917, lat: 35.6895 } },
-    "new york": { temp: 22, feels_like: 24, humidity: 55, pressure: 1018, wind: 2.8, desc: "clear sky", id: 800, country: "US", coord: { lon: -74.0060, lat: 40.7128 } },
-    "new york city": { temp: 22, feels_like: 24, humidity: 55, pressure: 1018, wind: 2.8, desc: "clear sky", id: 800, country: "US", coord: { lon: -74.0060, lat: 40.7128 } },
-    ottawa: { temp: 19, feels_like: 18, humidity: 42, pressure: 1014, wind: 2.7, desc: "scattered clouds", id: 802, country: "CA", coord: { lon: -75.6972, lat: 45.4215 } },
+    london: { temp: 13, feels_like: 13, temp_min: 8, temp_max: 16, humidity: 70, pressure: 1006, wind: 4.3, desc: "overcast clouds", id: 804, country: "GB", coord: { lon: -0.1276, lat: 51.5072 } },
+    paris: { temp: 24, feels_like: 23, temp_min: 18, temp_max: 28, humidity: 52, pressure: 1010, wind: 2.6, desc: "few clouds", id: 801, country: "FR", coord: { lon: 2.3522, lat: 48.8566 } },
+    ahmedabad: { temp: 32, feels_like: 35, temp_min: 28, temp_max: 36, humidity: 60, pressure: 1006, wind: 4.2, desc: "scattered clouds", id: 802, country: "IN", coord: { lon: 72.5714, lat: 23.0225 } },
+    "san francisco": { temp: 18, feels_like: 17, temp_min: 15, temp_max: 21, humidity: 75, pressure: 1015, wind: 4.8, desc: "fog", id: 741, country: "US", coord: { lon: -122.4194, lat: 37.7749 } },
+    "san francisco, ca": { temp: 18, feels_like: 17, temp_min: 15, temp_max: 21, humidity: 75, pressure: 1015, wind: 4.8, desc: "fog", id: 741, country: "US", coord: { lon: -122.4194, lat: 37.7749 } },
+    tokyo: { temp: 25, feels_like: 27, temp_min: 20, temp_max: 30, humidity: 65, pressure: 1010, wind: 3.2, desc: "partly cloudy", id: 802, country: "JP", coord: { lon: 139.6917, lat: 35.6895 } },
+    "new york": { temp: 22, feels_like: 24, temp_min: 18, temp_max: 26, humidity: 55, pressure: 1018, wind: 2.8, desc: "clear sky", id: 800, country: "US", coord: { lon: -74.0060, lat: 40.7128 } },
+    "new york city": { temp: 22, feels_like: 24, temp_min: 18, temp_max: 26, humidity: 55, pressure: 1018, wind: 2.8, desc: "clear sky", id: 800, country: "US", coord: { lon: -74.0060, lat: 40.7128 } },
+    ottawa: { temp: 19, feels_like: 18, temp_min: 15, temp_max: 23, humidity: 42, pressure: 1014, wind: 2.7, desc: "scattered clouds", id: 802, country: "CA", coord: { lon: -75.6972, lat: 45.4215 } },
   };
 
   const mockPayload = () => {
@@ -52,7 +52,14 @@ export default async function handler(req, res) {
           name: city,
           sys: { country: sample.country },
           dt: Math.floor(Date.now() / 1000),
-          main: { temp: units === "imperial" ? Math.round(sample.temp * 9/5 + 32) : sample.temp, feels_like: units === "imperial" ? Math.round(sample.feels_like * 9/5 + 32) : sample.feels_like, humidity: sample.humidity, pressure: sample.pressure },
+          main: { 
+            temp: sample.temp, // Always return in Celsius, let components convert
+            feels_like: sample.feels_like, // Always return in Celsius, let components convert
+            temp_min: sample.temp_min, // Always return in Celsius, let components convert
+            temp_max: sample.temp_max, // Always return in Celsius, let components convert
+            humidity: sample.humidity, 
+            pressure: sample.pressure 
+          },
           weather: [{ id: sample.id, description: sample.desc }],
           wind: { speed: units === "imperial" ? Math.round(sample.wind * 2.237 * 10)/10 : sample.wind },
           coord: sample.coord,
@@ -61,7 +68,14 @@ export default async function handler(req, res) {
           name: city,
           sys: { country: "XX" },
           dt: Math.floor(Date.now() / 1000),
-          main: { temp, feels_like: temp + 1, humidity: 55, pressure: 1012 },
+          main: { 
+            temp: 22, // Always return in Celsius
+            feels_like: 23, // Always return in Celsius
+            temp_min: 17, // Always return in Celsius
+            temp_max: 27, // Always return in Celsius
+            humidity: 55, 
+            pressure: 1012 
+          },
           weather: [{ id: 800, description: "clear sky" }],
           wind: { speed },
           coord: { lon: 0, lat: 0 },

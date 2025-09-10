@@ -1,17 +1,33 @@
 import { useState } from "react";
 import DayForecastCard from "./DayForecastCard";
 
-export default function ForecastPanel({ days = [], unit = "C", theme = "dark" }) {
+export default function ForecastPanel({ days = [], unit = "C", theme = "dark", weatherData = null }) {
   const [selectedDay, setSelectedDay] = useState("Today");
 
   // Generate mock 5-day forecast if none provided
+  const currentTemp = weatherData?.temperature || 24; // Use real current temp or fallback
+  
+  // Helper function for temperature conversion
+  const convertTemp = (tempC) => {
+    if (unit === "F") {
+      return Math.round((tempC * 9/5) + 32);
+    }
+    return Math.round(tempC);
+  };
+  
+  // The currentTemp is already in the correct unit from the API
+  // So we don't need to convert it, just use it directly
+  const baseTemp = Math.round(currentTemp);
+  const offset = unit === "F" ? 3.6 : 2; // 2°C = 3.6°F
+  
+  
   const mockDays = days.length > 0 ? days : [
     { 
       day: "Today", 
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       icon: "☀️", 
-      high: unit === "F" ? 76 : 24, 
-      low: unit === "F" ? 70 : 21, 
+      high: baseTemp + offset, 
+      low: baseTemp - (offset * 1.5), 
       condition: "Sunny",
       precipitation: 0,
       wind: 8
@@ -20,8 +36,8 @@ export default function ForecastPanel({ days = [], unit = "C", theme = "dark" })
       day: "Tomorrow", 
       date: new Date(Date.now() + 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       icon: "⛅", 
-      high: unit === "F" ? 74 : 23, 
-      low: unit === "F" ? 68 : 20, 
+      high: baseTemp + (offset * 0.5), 
+      low: baseTemp - (offset * 2), 
       condition: "Partly Cloudy",
       precipitation: 20,
       wind: 12
@@ -30,8 +46,8 @@ export default function ForecastPanel({ days = [], unit = "C", theme = "dark" })
       day: "Wed", 
       date: new Date(Date.now() + 172800000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       icon: "🌤️", 
-      high: unit === "F" ? 72 : 22, 
-      low: unit === "F" ? 66 : 19, 
+      high: baseTemp - (offset * 0.5), 
+      low: baseTemp - (offset * 2.5), 
       condition: "Mostly Cloudy",
       precipitation: 40,
       wind: 10
@@ -40,8 +56,8 @@ export default function ForecastPanel({ days = [], unit = "C", theme = "dark" })
       day: "Thu", 
       date: new Date(Date.now() + 259200000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       icon: "🌧️", 
-      high: unit === "F" ? 70 : 21, 
-      low: unit === "F" ? 64 : 18, 
+      high: baseTemp - offset, 
+      low: baseTemp - (offset * 3), 
       condition: "Light Rain",
       precipitation: 80,
       wind: 15
@@ -50,8 +66,8 @@ export default function ForecastPanel({ days = [], unit = "C", theme = "dark" })
       day: "Fri", 
       date: new Date(Date.now() + 345600000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       icon: "⛅", 
-      high: unit === "F" ? 73 : 23, 
-      low: unit === "F" ? 67 : 19, 
+      high: baseTemp, 
+      low: baseTemp - (offset * 2), 
       condition: "Partly Cloudy",
       precipitation: 10,
       wind: 9

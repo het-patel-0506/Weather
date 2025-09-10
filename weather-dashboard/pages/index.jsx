@@ -38,6 +38,14 @@ export default function HomePage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   useEffect(() => setMounted(true), []);
+  
+  // Load London by default if no data
+  useEffect(() => {
+    if (mounted && !data && !loading && !error) {
+      search("London");
+    }
+  }, [mounted, data, loading, error, search]);
+  
   useEffect(() => {
     if (data && !loading && !error) {
       resultRef.current?.focus?.();
@@ -87,8 +95,7 @@ export default function HomePage() {
           ? "bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white" 
           : "bg-gradient-to-br from-slate-100 via-slate-50 to-slate-200 text-slate-900"
       }`}>
-        
-      {/* Background pattern */}
+        {/* Background pattern */}
       <div className="fixed inset-0 opacity-40" style={{
         backgroundImage: theme === "dark" 
           ? `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
@@ -161,7 +168,7 @@ export default function HomePage() {
                     />
                   )}
                   <div className="mt-6">
-                    {loading ? <HourlySkeleton /> : <HourlyForecast unit={unit} theme={theme} hasData={!!data} />}
+                    {loading ? <HourlySkeleton /> : <HourlyForecast unit={unit} theme={theme} hasData={!!data} weatherData={data} />}
                   </div>
                   <div ref={resultRef} tabIndex={-1} aria-hidden className="sr-only">results-focus-sentinel</div>
                 </main>
@@ -171,7 +178,7 @@ export default function HomePage() {
             {/* Right Column - Forecast & Map */}
             <aside className="lg:col-span-4">
               <div className="space-y-6">
-                        {loading ? <ForecastSkeleton /> : <ForecastPanel unit={unit} theme={theme} />}
+                        {loading ? <ForecastSkeleton /> : <ForecastPanel unit={unit} theme={theme} weatherData={data} />}
                 {loading ? <MapSkeleton /> : (
                   <InteractiveMap 
                     city={data?.city || data?.name || "San Francisco, CA"}
