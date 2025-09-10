@@ -3,9 +3,6 @@ import { useState, useEffect, useMemo } from "react";
 export default function HourlyForecast({ hours = [], unit = "C", theme = "dark", hasData = false, weatherData = null }) {
   const [mockHours, setMockHours] = useState([]);
 
-  // Don't show if no data
-  if (!hasData) return null;
-
   // Convert temperature based on unit
   const convertTemp = (tempC) => {
     if (unit === "F") {
@@ -16,11 +13,12 @@ export default function HourlyForecast({ hours = [], unit = "C", theme = "dark",
 
   // Generate stable hourly data starting from current time
   const generateDynamicHours = () => {
-    const now = new Date();
-    const hours = [];
-    
-    // Use a seed based on current date to make data stable for the day
-    const seed = Math.floor(now.getTime() / (1000 * 60 * 60 * 24)); // Changes once per day
+    try {
+      const now = new Date();
+      const hours = [];
+      
+      // Use a seed based on current date to make data stable for the day
+      const seed = Math.floor(now.getTime() / (1000 * 60 * 60 * 24)); // Changes once per day
     
     for (let i = 0; i < 12; i++) {
       const hourTime = new Date(now.getTime() + i * 60 * 60 * 1000);
@@ -93,30 +91,42 @@ export default function HourlyForecast({ hours = [], unit = "C", theme = "dark",
     }
     
     return hours;
+    } catch (error) {
+      console.warn('Error generating dynamic hours:', error);
+      return []; // Return empty array on error
+    }
   };
 
   // Memoize the generated hours to prevent unnecessary regeneration
   const generatedHours = useMemo(() => {
     return generateDynamicHours();
-  }, [weatherData]); // Regenerate when weather data changes
+  }, [weatherData?.temperature, weatherData?.city]); // Regenerate when weather data changes
 
   // Generate or update mock hours when unit changes
   useEffect(() => {
-    if (hours.length > 0) {
-      // If real hours data is provided, convert temperatures
-      const convertedHours = hours.map(hour => ({
-        ...hour,
-        temp: convertTemp(hour.tempC || hour.temp)
-      }));
-      setMockHours(convertedHours);
-    } else {
-      // Use memoized generated data
-      setMockHours(generatedHours);
+    try {
+      if (hours && hours.length > 0) {
+        // If real hours data is provided, convert temperatures
+        const convertedHours = hours.map(hour => ({
+          ...hour,
+          temp: convertTemp(hour.tempC || hour.temp || 20) // Add fallback temp
+        }));
+        setMockHours(convertedHours);
+      } else {
+        // Use memoized generated data
+        setMockHours(generatedHours || []);
+      }
+    } catch (error) {
+      console.warn('Error processing hourly forecast data:', error);
+      setMockHours([]);
     }
   }, [unit, hours, generatedHours]);
 
-  // Use state for mock hours
-  const displayHours = mockHours.length > 0 ? mockHours : generatedHours;
+  // Use state for mock hours with fallback
+  const displayHours = mockHours.length > 0 ? mockHours : (generatedHours || []);
+
+  // Don't show if no data - moved after all hooks
+  if (!hasData || displayHours.length === 0) return null;
 
   return (
     <div className={`backdrop-blur-sm rounded-xl p-4 transition-all duration-300 ${

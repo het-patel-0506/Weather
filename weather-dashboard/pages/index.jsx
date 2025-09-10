@@ -11,7 +11,12 @@ import ForecastPanel from "../components/ForecastPanel";
 import InteractiveMap from "../components/InteractiveMap";
 import { WeatherCardSkeleton, ChartSkeleton, ForecastSkeleton, HourlySkeleton, MapSkeleton } from "../components/LoadingSkeletons";
 import FloatingError from "../components/FloatingError";
+import SettingsPanel from "../components/SettingsPanel";
+import LocationFallbackModal from "../components/LocationFallbackModal";
+import LocationServices from "../components/LocationServices";
+import RecentLocations from "../components/RecentLocations";
 import { useWeather } from "../hooks/useWeather";
+import { useLocation } from "../hooks/useLocation";
 
 export default function HomePage() {
   const {
@@ -33,10 +38,40 @@ export default function HomePage() {
     clear,
   } = useWeather();
 
+  const {
+    currentLocation,
+    isUsingDeviceLocation,
+    locationPermission,
+    isGeolocating,
+    locationError,
+    recentLocations,
+    favoriteLocations,
+    autoDetectEnabled,
+    geofencingEnabled,
+    getCurrentLocation,
+    addToRecentLocations,
+    toggleFavoriteLocation,
+    removeRecentLocation,
+    reorderRecentLocations,
+    clearLocationData,
+    getWeatherForCoordinates,
+    setAutoDetectEnabled,
+    setGeofencingEnabled,
+    setIsUsingDeviceLocation,
+    setLocationError
+  } = useLocation();
+
   const resultRef = useRef(null);
   const [mounted, setMounted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isLocationFallbackOpen, setIsLocationFallbackOpen] = useState(false);
+  const [mapLayers, setMapLayers] = useState({
+    rainfall: false,
+    radar: false,
+    temperature: false
+  });
   useEffect(() => setMounted(true), []);
   
   // Load London by default if no data
@@ -64,6 +99,108 @@ export default function HomePage() {
       setRefreshTrigger(prev => prev + 1);
     }
   }, [data]);
+
+  // Listen for settings panel events
+  useEffect(() => {
+    const handleUnitChange = (event) => {
+      const { unit: newUnit } = event.detail;
+      if (newUnit !== unit) {
+        toggleUnit();
+      }
+    };
+
+    const handleThemeChange = (event) => {
+      const { theme: newTheme } = event.detail;
+      if (newTheme !== theme) {
+        toggleTheme();
+      }
+    };
+
+    const handleWeatherRefresh = () => {
+      if (data && data.city) {
+        search(data.city);
+      }
+    };
+
+    const handleDataCleared = () => {
+      clear();
+      setRefreshTrigger(prev => prev + 1);
+    };
+
+    const handleMapLayerChange = (event) => {
+      const { layer, enabled } = event.detail;
+      setMapLayers(prev => ({
+        ...prev,
+        [layer]: enabled
+      }));
+    };
+
+    const handleRequestLocation = () => {
+      getCurrentLocation().catch((error) => {
+        setIsLocationFallbackOpen(true);
+      });
+    };
+
+    const handleGeofencingAlert = (event) => {
+      const alert = event.detail;
+      // Show alert notification
+      setErrorMessage(`Weather Alert: ${alert.message}`);
+    };
+
+    window.addEventListener('unitChange', handleUnitChange);
+    window.addEventListener('themeChange', handleThemeChange);
+    window.addEventListener('weatherRefresh', handleWeatherRefresh);
+    window.addEventListener('dataCleared', handleDataCleared);
+    window.addEventListener('mapLayerChange', handleMapLayerChange);
+    window.addEventListener('requestLocation', handleRequestLocation);
+    window.addEventListener('geofencingAlert', handleGeofencingAlert);
+
+    return () => {
+      window.removeEventListener('unitChange', handleUnitChange);
+      window.removeEventListener('themeChange', handleThemeChange);
+      window.removeEventListener('weatherRefresh', handleWeatherRefresh);
+      window.removeEventListener('dataCleared', handleDataCleared);
+      window.removeEventListener('mapLayerChange', handleMapLayerChange);
+      window.removeEventListener('requestLocation', handleRequestLocation);
+      window.removeEventListener('geofencingAlert', handleGeofencingAlert);
+    };
+  }, [unit, theme, data, toggleUnit, toggleTheme, search, clear]);
+
+  // Location handlers
+  const handleUseLocation = async () => {
+    try {
+      const location = await getCurrentLocation();
+      // Search for weather at the current location
+      if (location) {
+        // For now, we'll use a generic city name - in a real app, you'd reverse geocode
+        const cityName = `Current Location (${location.lat.toFixed(2)}, ${location.lon.toFixed(2)})`;
+        search(cityName);
+        addToRecentLocations(location, cityName);
+      }
+    } catch (error) {
+      setIsLocationFallbackOpen(true);
+    }
+  };
+
+  const handleLocationSelect = (location) => {
+    if (location.name) {
+      search(location.name);
+    } else {
+      // Handle coordinates
+      const cityName = `${location.lat.toFixed(2)}, ${location.lon.toFixed(2)}`;
+      search(cityName);
+    }
+  };
+
+  const handleMapLocationSelect = async (coordinates) => {
+    try {
+      const cityName = `${coordinates.lat.toFixed(2)}, ${coordinates.lon.toFixed(2)}`;
+      search(cityName);
+      addToRecentLocations(coordinates, cityName);
+    } catch (error) {
+      console.error('Error handling map location:', error);
+    }
+  };
 
   const activeCity = (data && (data.city || data.name)) || lastQuery || "";
   const defaultCities = ["New York City", "London", "Paris", "Ahmedabad"];
@@ -108,8 +245,8 @@ export default function HomePage() {
                   onToggleTheme={toggleTheme}
                   onSearch={search}
                   onHelp={() => alert("Enter a city name and press Search. Toggle theme with the moon/sun.")}
-                  onSettings={() => alert("Settings panel coming soon")}
-                  onLocation={() => alert("Location services coming soon")}
+                  onSettings={() => setIsSettingsOpen(true)}
+                  onLocation={handleUseLocation}
                   onMenu={() => alert("Menu panel coming soon")}
                 />
         {mounted ? (
@@ -131,6 +268,29 @@ export default function HomePage() {
                   onToggleFavorite={(city) => toggleFavorite(city)}
                   refreshTrigger={refreshTrigger}
                 />
+                
+                {/* Location Services */}
+                <div className="mt-6">
+                  <LocationServices
+                    onUseLocation={handleUseLocation}
+                    isGeolocating={isGeolocating}
+                    isUsingDeviceLocation={isUsingDeviceLocation}
+                    theme={theme}
+                  />
+                </div>
+                
+                {/* Recent Locations */}
+                <div className="mt-6">
+                  <RecentLocations
+                    recentLocations={recentLocations}
+                    favoriteLocations={favoriteLocations}
+                    onLocationSelect={handleLocationSelect}
+                    onToggleFavorite={toggleFavoriteLocation}
+                    onRemoveLocation={removeRecentLocation}
+                    onReorderLocations={reorderRecentLocations}
+                    theme={theme}
+                  />
+                </div>
               </div>
             </aside>
             
@@ -185,6 +345,9 @@ export default function HomePage() {
                     coordinates={data?.coord || { lat: 37.7749, lon: -122.4194 }}
                     weatherData={data}
                     apiKey={process.env.NEXT_PUBLIC_WEATHER_API_KEY}
+                    mapLayers={mapLayers}
+                    onLocationSelect={handleMapLocationSelect}
+                    key={`${data?.coord?.lat}-${data?.coord?.lon}-${data?.city}`}
                   />
                 )}
               </div>
@@ -199,6 +362,22 @@ export default function HomePage() {
         message={errorMessage} 
         onClose={() => setErrorMessage("")} 
         theme={theme} 
+      />
+      
+      {/* Settings Panel */}
+      <SettingsPanel 
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        theme={theme}
+      />
+      
+      {/* Location Fallback Modal */}
+      <LocationFallbackModal
+        isOpen={isLocationFallbackOpen}
+        onClose={() => setIsLocationFallbackOpen(false)}
+        onSearch={search}
+        error={locationError}
+        theme={theme}
       />
     </div>
     </>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
 
 // Dynamically import Leaflet components to avoid SSR issues
@@ -22,11 +22,15 @@ export default function InteractiveMap({
   city = "San Francisco, CA", 
   coordinates = { lat: 37.7749, lon: -122.4194 },
   weatherData = null,
-  apiKey = null
+  apiKey = null,
+  mapLayers = { rainfall: false, radar: false, temperature: false },
+  onLocationSelect = null
 }) {
   const [mounted, setMounted] = useState(false);
   const [mapCenter, setMapCenter] = useState([coordinates.lat, coordinates.lon]);
   const [zoom, setZoom] = useState(10);
+  const [clickedLocation, setClickedLocation] = useState(null);
+  const [mapInstance, setMapInstance] = useState(null);
 
   useEffect(() => {
     setMounted(true);
@@ -45,14 +49,36 @@ export default function InteractiveMap({
 
   useEffect(() => {
     // Update map center when coordinates change
-    setMapCenter([coordinates.lat, coordinates.lon]);
-  }, [coordinates]);
+    if (coordinates && coordinates.lat && coordinates.lon) {
+      const newCenter = [coordinates.lat, coordinates.lon];
+      setMapCenter(newCenter);
+      
+      // Programmatically move the map if it's already mounted
+      if (mapInstance) {
+        mapInstance.setView(newCenter, zoom);
+      }
+    }
+  }, [coordinates, zoom, mapInstance]);
 
   const handleMapMove = (e) => {
     const center = e.target.getCenter();
     const newZoom = e.target.getZoom();
     const position = { center: [center.lat, center.lng], zoom: newZoom };
     localStorage.setItem('mapPosition', JSON.stringify(position));
+  };
+
+  const handleMapClick = (e) => {
+    if (!onLocationSelect) return;
+    
+    const { lat, lng } = e.latlng;
+    setClickedLocation({ lat, lon: lng });
+  };
+
+  const handleGetWeatherForLocation = () => {
+    if (clickedLocation && onLocationSelect) {
+      onLocationSelect(clickedLocation);
+      setClickedLocation(null);
+    }
   };
 
   if (!mounted) {
@@ -90,7 +116,9 @@ export default function InteractiveMap({
           zoom={zoom}
           style={{ height: "100%", width: "100%" }}
           whenReady={(map) => {
+            setMapInstance(map.target);
             map.target.on('moveend', handleMapMove);
+            map.target.on('click', handleMapClick);
           }}
         >
           {/* Base map tiles */}
@@ -99,11 +127,29 @@ export default function InteractiveMap({
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           
-          {/* Precipitation overlay (if API key is available) */}
-          {apiKey && (
+          {/* Precipitation overlay (if enabled and API key is available) */}
+          {apiKey && mapLayers.rainfall && (
             <TileLayer
               attribution='&copy; <a href="https://openweathermap.org/">OpenWeatherMap</a>'
               url={`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${apiKey}`}
+              opacity={0.6}
+            />
+          )}
+          
+          {/* Radar overlay (if enabled and API key is available) */}
+          {apiKey && mapLayers.radar && (
+            <TileLayer
+              attribution='&copy; <a href="https://openweathermap.org/">OpenWeatherMap</a>'
+              url={`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${apiKey}`}
+              opacity={0.5}
+            />
+          )}
+          
+          {/* Temperature overlay (if enabled and API key is available) */}
+          {apiKey && mapLayers.temperature && (
+            <TileLayer
+              attribution='&copy; <a href="https://openweathermap.org/">OpenWeatherMap</a>'
+              url={`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${apiKey}`}
               opacity={0.6}
             />
           )}
@@ -123,6 +169,27 @@ export default function InteractiveMap({
               </div>
             </Popup>
           </Marker>
+          
+          {/* Clicked location marker */}
+          {clickedLocation && (
+            <Marker position={[clickedLocation.lat, clickedLocation.lon]}>
+              <Popup>
+                <div className="text-center p-2">
+                  <div className="font-semibold mb-2">New Location</div>
+                  <div className="text-sm text-gray-600 mb-3">
+                    <div>Lat: {clickedLocation.lat.toFixed(4)}</div>
+                    <div>Lon: {clickedLocation.lon.toFixed(4)}</div>
+                  </div>
+                  <button
+                    onClick={handleGetWeatherForLocation}
+                    className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded-lg transition-colors"
+                  >
+                    Get Weather Here
+                  </button>
+                </div>
+              </Popup>
+            </Marker>
+          )}
         </MapContainer>
       </div>
       
