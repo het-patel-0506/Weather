@@ -9,7 +9,7 @@ const commonCities = [
   "Baltimore", "Milwaukee", "Albuquerque", "Tucson", "Fresno", "Sacramento", "Mesa", "Kansas City", "Atlanta", "Omaha",
   "Colorado Springs", "Raleigh", "Miami", "Virginia Beach", "Oakland", "Minneapolis", "Tulsa", "Arlington", "Tampa", "New Orleans",
   "London", "Paris", "Tokyo", "Berlin", "Madrid", "Rome", "Amsterdam", "Vienna", "Prague", "Barcelona",
-  "Moscow", "Istanbul", "Cairo", "Dubai", "Mumbai", "Delhi", "Bangalore", "Kolkata", "Chennai", "Hyderabad",
+  "Moscow", "Istanbul", "Cairo", "Dubai", "Mumbai", "Delhi", "Bangalore", "Kolkata", "Chennai", "Hyderabad", "Ahmedabad", "Pune", "Jaipur", "Surat",
   "Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide", "Toronto", "Vancouver", "Montreal", "Calgary", "Ottawa",
   "Mexico City", "São Paulo", "Rio de Janeiro", "Buenos Aires", "Lima", "Bogotá", "Santiago", "Caracas", "Quito", "La Paz",
   "Beijing", "Shanghai", "Guangzhou", "Shenzhen", "Chengdu", "Wuhan", "Xi'an", "Nanjing", "Hangzhou", "Qingdao",

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 
 export default function SettingsPanel({ isOpen, onClose, theme = "dark" }) {
   // Settings state with localStorage persistence

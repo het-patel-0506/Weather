@@ -1,9 +1,9 @@
-import EmptyState from "./EmptyState";
-import Spinner from "./Spinner";
-import ErrorBanner from "./ErrorBanner";
+import EmptyState from "../../common/feedback/EmptyState";
+import Spinner from "../../common/loading/Spinner";
+import ErrorBanner from "../../common/feedback/ErrorBanner";
 import WeatherCard from "./WeatherCard";
-import ForecastStrip from "./ForecastStrip";
-import { CardSkeleton, ForecastSkeleton } from "./Skeletons";
+import ForecastStrip from "../forecast/ForecastStrip";
+import { CardSkeleton, ForecastSkeleton } from "../../common/loading/Skeletons";
 
 export default function WeatherArea({
   loading,

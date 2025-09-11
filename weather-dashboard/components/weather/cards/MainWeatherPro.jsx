@@ -1,5 +1,5 @@
-import CityHeader from "./CityHeader";
-import TempChart from "./TempChart";
+import CityHeader from "../../search/navigation/CityHeader";
+import TempChart from "../charts/TempChart";
 
 function MetricCard({ label, value, unit, icon, trend, theme = "dark" }) {
   return (

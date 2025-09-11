@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useLocalStorage } from "./useLocalStorage";
-import { fetchWeather as fetchWeatherProxy } from "../lib/api";
+import { fetchWeather as fetchWeatherProxy } from "../lib/utils/api";
 
 const cache = new Map(); // key: `${city}|${units}` -> mapped weather
 

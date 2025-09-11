@@ -1,4 +1,4 @@
-import FavoriteButton from "./FavoriteButton";
+import FavoriteButton from "../../common/buttons/FavoriteButton";
 import MetricTile from "./MetricTile";
 
 function WeatherIcon({ id, description }) {

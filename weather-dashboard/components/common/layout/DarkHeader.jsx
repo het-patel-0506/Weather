@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import CenterSearch from "./CenterSearch";
+import CenterSearch from "../../search/CenterSearch";
 
 export default function DarkHeader({ theme, onToggleTheme, onHelp, onSettings, onLocation, onMenu, onSearch }) {
   const [mounted, setMounted] = useState(false);

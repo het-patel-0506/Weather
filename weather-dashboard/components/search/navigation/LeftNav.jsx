@@ -1,4 +1,4 @@
-import CitySearch from "./CitySearch";
+import CitySearch from "../CitySearch";
 import CityList from "./CityList";
 
 export default function LeftNav({ cities = [], activeCity = "", onSelect, onAdd, favorites = [], onToggleFavorite, theme = "dark", refreshTrigger = 0 }) {

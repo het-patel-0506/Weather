@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import FavoriteButton from "./FavoriteButton";
+import FavoriteButton from "../../common/buttons/FavoriteButton";
 
 function WeatherIcon({ id, description }) {
   const iconMap = {
