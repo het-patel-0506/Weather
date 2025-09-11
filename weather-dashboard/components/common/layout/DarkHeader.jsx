@@ -1,9 +1,19 @@
 import { useEffect, useState } from "react";
 import CenterSearch from "../../search/CenterSearch";
+import Toast from "../../common/feedback/Toast";
 
 export default function DarkHeader({ theme, onToggleTheme, onHelp, onSettings, onLocation, onMenu, onSearch }) {
   const [mounted, setMounted] = useState(false);
+  const [toast, setToast] = useState({ message: "", type: "info" });
   useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    const handler = (e) => {
+      const { message, type } = e.detail || {};
+      if (message) setToast({ message, type: type || 'info' });
+    };
+    window.addEventListener('appToast', handler);
+    return () => window.removeEventListener('appToast', handler);
+  }, []);
   useEffect(() => {
     const root = document.documentElement;
     if (theme === "dark") {
@@ -106,7 +116,10 @@ export default function DarkHeader({ theme, onToggleTheme, onHelp, onSettings, o
         
         <button
           type="button"
-          onClick={onMenu}
+          onClick={() => {
+            setToast({ message: "Menu panel coming soon", type: "info" });
+            onMenu?.();
+          }}
           className={`inline-flex items-center justify-center h-10 w-10 rounded-full border transition-all focus:outline-none focus-visible:ring-2 ${
             theme === "dark"
               ? "border-white/20 hover:bg-white/10 focus-visible:ring-white/50"
@@ -120,6 +133,13 @@ export default function DarkHeader({ theme, onToggleTheme, onHelp, onSettings, o
           }`}>☰</span>
         </button>
       </div>
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ message: "", type: "info" })}
+        duration={5000}
+        theme={theme}
+      />
     </header>
   );
 }

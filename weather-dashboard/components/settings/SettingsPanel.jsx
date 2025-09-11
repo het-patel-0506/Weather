@@ -478,7 +478,7 @@ export default function SettingsPanel({ isOpen, onClose, theme = "dark" }) {
                 highContrast={highContrast}
               >
                 <button
-                  onClick={() => alert('Account sync coming soon!')}
+                  onClick={() => window.dispatchEvent(new CustomEvent('appToast', { detail: { message: 'Account sync coming soon!', type: 'info' } }))}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     theme === "dark"
                       ? "bg-blue-600 hover:bg-blue-700 text-white"

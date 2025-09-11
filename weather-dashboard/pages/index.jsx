@@ -250,10 +250,21 @@ export default function HomePage() {
                   theme={theme}
                   onToggleTheme={toggleTheme}
                   onSearch={search}
-                  onHelp={() => alert("Enter a city name and press Search. Toggle theme with the moon/sun.")}
+                  onHelp={() => {
+                    // Use a custom toast event consumed by DarkHeader/FloatingError,
+                    // keeping UI consistent and non-blocking
+                    window.dispatchEvent(new CustomEvent('appToast', {
+                      detail: { message: 'Enter a city name and press Search. Toggle theme with the moon/sun.', type: 'info' }
+                    }));
+                  }}
                   onSettings={() => setIsSettingsOpen(true)}
                   onLocation={handleUseLocation}
-                  onMenu={() => alert("Menu panel coming soon")}
+                  onMenu={() => {
+                    // Toast handled inside DarkHeader; no blocking alert
+                    window.dispatchEvent(new CustomEvent('appToast', {
+                      detail: { message: 'Menu panel coming soon', type: 'info' }
+                    }));
+                  }}
                 />
         {mounted ? (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
