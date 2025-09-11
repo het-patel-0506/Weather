@@ -31,13 +31,42 @@ export default async function handler(req, res) {
     return res.status(400).json({ message: "City is required" });
   }
 
+  // Helper: detect and parse coordinates from the provided "city" string.
+  // Supports formats like:
+  //  - "23.03, 72.61"
+  //  - "Current Location (23.03, 72.61)"
+  //  - any text containing "lat, lon" as the first two numbers
+  const parseCoordinates = (value) => {
+    try {
+      const match = String(value).match(/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/);
+      if (!match) return null;
+      const lat = parseFloat(match[1]);
+      const lon = parseFloat(match[2]);
+      if (Number.isFinite(lat) && Number.isFinite(lon) && lat <= 90 && lat >= -90 && lon <= 180 && lon >= -180) {
+        return { lat, lon };
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  };
+
+  const coords = parseCoordinates(city);
+
+  // Build the OpenWeatherMap URL using coordinates when available to get the
+  // nearest city's weather (OWM will return the closest location's name).
   const url = new URL("https://api.openweathermap.org/data/2.5/weather");
-  url.searchParams.set("q", city);
+  if (coords) {
+    url.searchParams.set("lat", String(coords.lat));
+    url.searchParams.set("lon", String(coords.lon));
+  } else {
+    url.searchParams.set("q", city);
+  }
   url.searchParams.set("appid", apiKey);
   url.searchParams.set("units", units === "imperial" ? "imperial" : "metric");
 
   // Avoid logging sensitive data like full keys or URLs containing keys
-  console.log("Requesting weather", { city, units, keyLen: apiKey.length });
+  console.log("Requesting weather", { city, units, keyLen: apiKey.length, usingCoords: !!coords });
 
   const shouldMock =
     process.env.NODE_ENV !== "production" && (process.env.MOCK_WEATHER === "1" || mock === "1");

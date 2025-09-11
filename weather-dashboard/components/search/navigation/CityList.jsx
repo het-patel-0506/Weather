@@ -84,7 +84,9 @@ function CityListItem({ city, isActive, isFavorite, onSelect, onToggleFavorite, 
       onClick={onSelect}
       className={`group flex items-center justify-between w-full text-left px-3 py-2 rounded-lg transition-all duration-200 ${
         isActive
-          ? "bg-amber-400/20 border border-amber-400/50 text-amber-200 shadow-[0_0_0_1px_rgba(255,155,61,.3)]"
+          ? theme === "dark"
+            ? "bg-amber-400/20 border border-amber-400/50 text-amber-200 shadow-[0_0_0_1px_rgba(255,155,61,.3)]"
+            : "bg-amber-300/30 border border-amber-300 text-slate-900 shadow-[0_0_0_1px_rgba(251,191,36,.45)]"
           : theme === "dark"
             ? "bg-white/5 hover:bg-white/10 border border-white/10 text-white"
             : "bg-slate-100/50 hover:bg-slate-200/50 border border-slate-200/50 text-slate-900"

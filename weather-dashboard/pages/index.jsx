@@ -123,7 +123,13 @@ export default function HomePage() {
     };
 
     const handleDataCleared = () => {
+      // Clear weather data in memory
       clear();
+      // Clear location-related state in memory (recent/manual lists)
+      try {
+        clearLocationData();
+      } catch {}
+      // Trigger left panel to re-read from storage (now empty)
       setRefreshTrigger(prev => prev + 1);
     };
 

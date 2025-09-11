@@ -24,7 +24,9 @@ export default function DayForecastCard({
       onMouseLeave={() => setIsHovered(false)}
       className={`w-full p-4 rounded-lg transition-all duration-300 ${
         isSelected
-          ? "bg-amber-400/20 border border-amber-400/50 text-amber-200 shadow-[0_0_0_1px_rgba(255,155,61,.3)]"
+          ? theme === "dark"
+            ? "bg-amber-400/20 border border-amber-400/50 text-amber-200 shadow-[0_0_0_1px_rgba(255,155,61,.3)]"
+            : "bg-amber-300/30 border border-amber-300 text-slate-900 shadow-[0_0_0_1px_rgba(251,191,36,.45)]"
           : theme === "dark"
             ? "bg-white/10 border border-white/20 text-white hover:bg-white/20"
             : "bg-white/80 border border-slate-200/50 text-slate-900 hover:bg-slate-100/80"
